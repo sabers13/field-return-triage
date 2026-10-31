@@ -28,7 +28,7 @@ data: ## Derive the library, eval set and trend tables (lane R1)
 	@echo "data: not built yet (lane R1)"; exit 1
 
 index: ## Embed the library into the local vector cache (lane R3)
-	@echo "index: not built yet (lane R3)"; exit 1
+	uv run --extra index python -m field_return_triage.similar.cli
 
 test: ## Run the test suite with the network blocked
 	$(PYTEST) -q
