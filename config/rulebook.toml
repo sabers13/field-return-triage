@@ -1,0 +1,96 @@
+# Rulebook rb1: condition or symptom kind -> the next test, what to inspect, and what to
+# ask the customer for.
+#
+# THIS IS AN EXAMPLE. It follows the practice described in PLAN.md section 4, and a lab
+# adapts it to its own test catalogue: rename the tests to the tests the lab can actually
+# run, and add or remove kinds with the local failure-analysis experience. Nothing in the
+# code depends on the wording below except the version string.
+#
+# Kinds are the fixed vocabularies from PLAN.md section 4 (symptom and condition kinds
+# share one table). An unknown kind is a configuration error, not a silent fallback.
+# The `other` kinds are deliberately absent: they carry no specific clue, so they fall
+# back to the standard test.
+
+version = "rb1"
+
+[fallback]
+# With no condition and no specific symptom, the standard test runs first and the card
+# asks for the information that would change the next test.
+test = "standard test"
+inspect = []
+request = ["when it happens", "how often", "under which conditions", "fault codes"]
+
+[kinds.moisture]
+tests = ["humidity / condensation test"]
+inspect = ["connectors and seals"]
+request = ["when the part was exposed to water or condensation"]
+
+[kinds.cold]
+tests = ["low-temperature operation and temperature cycling"]
+inspect = []
+request = ["the ambient temperature when the fault appears"]
+
+[kinds.heat]
+tests = ["high-temperature operation"]
+inspect = []
+request = ["the operating temperature when the fault appears"]
+
+[kinds.vibration_or_road]
+tests = ["vibration test"]
+inspect = ["solder joints and connectors"]
+request = ["the road or vibration conditions when the fault appears"]
+
+[kinds.intermittent]
+tests = ["long-run / power-cycling test with monitoring"]
+inspect = []
+request = ["how often the fault appears and how long it lasts"]
+
+[kinds.after_service]
+tests = ["check installation, connectors and wiring routing first"]
+inspect = []
+request = ["what was repaired, and when"]
+
+[kinds.charging]
+tests = ["electrical load and charging-profile test"]
+inspect = []
+request = ["the charging source and state of charge when the fault appears"]
+
+[kinds.speed_or_load]
+tests = ["load test at the reported speed or load"]
+inspect = ["mounting and thermal behaviour under load"]
+request = ["the speed or load at which the fault appears"]
+
+[kinds.startup]
+tests = ["cold-start and power-up sequence test"]
+inspect = ["start-up circuit and supply"]
+request = ["whether the fault appears on every start"]
+
+[kinds.no_function]
+tests = ["functional check at the operating voltage"]
+inspect = ["supply voltage and ground connections"]
+request = ["what stopped working, and whether anything still works"]
+
+[kinds.warning_light]
+tests = ["fault-code readout and warning-light circuit check"]
+inspect = ["warning-light contacts and control-unit memory"]
+request = ["the exact warning text or lamp, and when it appears"]
+
+[kinds.smoke_or_burn]
+tests = ["visual inspection for burn marks, then insulation and current-draw test"]
+inspect = ["housings, tracks and connectors"]
+request = ["whether smoke, a burning smell or heat was noticed"]
+
+[kinds.noise]
+tests = ["acoustic and vibration check while operating"]
+inspect = ["mounting points and moving parts"]
+request = ["when the noise appears and what it sounds like"]
+
+[kinds.display_fault]
+tests = ["display driver and segment test"]
+inspect = ["display connector and driver board"]
+request = ["which part of the display is affected"]
+
+[kinds.battery_drain]
+tests = ["quiescent-current measurement and charging-profile test"]
+inspect = ["battery and quiescent load"]
+request = ["how quickly the battery drains, and after what use"]

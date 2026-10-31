@@ -1,0 +1,2 @@
+{"action": "accept", "card_id": "demo-complaint-0001:example-model", "complaint_id": "demo-complaint-0001", "decided_at": "2026-10-31T12:02:00+00:00", "reason": null, "time_to_decision_s": 41.0}
+{"action": "change", "card_id": "demo-complaint-0002:example-model", "complaint_id": "demo-complaint-0002", "decided_at": "2026-10-31T12:05:30+00:00", "reason": "no humidity chamber available this week; run the standard test first", "time_to_decision_s": 87.5}

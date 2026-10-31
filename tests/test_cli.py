@@ -40,9 +40,7 @@ def test_help_lists_every_lane_command() -> None:
         assert command in result.output
 
 
-@pytest.mark.parametrize(
-    ("command", "args"), [("data", []), ("index", []), ("review", []), ("trend", [])]
-)
+@pytest.mark.parametrize(("command", "args"), [("data", []), ("index", []), ("trend", [])])
 def test_simple_stubs_name_their_lane(command: str, args: list[str]) -> None:
     result = runner.invoke(app, [command, *args])
     assert result.exit_code == 2
