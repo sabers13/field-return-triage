@@ -19,7 +19,6 @@ STUBBED = {
     "triage": "R6",
     "eval": "R6",
     "review": "R4",
-    "trend": "R5",
 }
 
 
@@ -40,7 +39,7 @@ def test_help_lists_every_lane_command() -> None:
         assert command in result.output
 
 
-@pytest.mark.parametrize(("command", "args"), [("data", []), ("trend", [])])
+@pytest.mark.parametrize(("command", "args"), [("data", [])])
 def test_simple_stubs_name_their_lane(command: str, args: list[str]) -> None:
     result = runner.invoke(app, [command, *args])
     assert result.exit_code == 2

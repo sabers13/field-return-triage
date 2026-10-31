@@ -60,7 +60,7 @@ live: ## The one paid run; needs a key and the budget (lane R7)
 	@echo "live: not built yet (lane R7)"; exit 1
 
 trend: ## Detect weekly spikes and backtest them against recalls (lane R5)
-	@echo "trend: not built yet (lane R5)"; exit 1
+	uv run python -m field_return_triage.trend.cli
 
 results: ## Export results and the summary from replay (lane R6)
 	@echo "results: not built yet (lane R6)"; exit 1
