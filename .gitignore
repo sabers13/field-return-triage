@@ -1,0 +1,27 @@
+# Secrets and local state - never committed
+.env
+.venv/
+data/raw/
+data/feedback/*
+!data/feedback/example.decisions.jsonl
+.opencode/
+
+# Caches built outside git by `make index`
+.cache/
+
+# Python / tooling caches
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+
+# OS noise
+.DS_Store
+
+# `dist/` is deliberately NOT ignored: it is the built page, committed by the page lane.
