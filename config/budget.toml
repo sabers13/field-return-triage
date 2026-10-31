@@ -1,0 +1,12 @@
+# Run budget and pacing (PLAN §8).
+#
+# The hard cap applies to the whole live run. The client paces per model: at most
+# `max_concurrency` requests in flight and `requests_per_minute` starts in any
+# rolling minute. `max_attempts` counts the first try, so 4 means three retries, and
+# covers transport errors and 429 only. `backoff_seconds` doubles per retry.
+hard_cap_usd = 3.0
+max_concurrency = 2
+requests_per_minute = 30
+max_attempts = 4
+backoff_seconds = 0.5
+request_timeout_seconds = 60.0
