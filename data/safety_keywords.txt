@@ -1,0 +1,33 @@
+# Safety keyword rule (PLAN.md section 6), committed by R1 before any model result.
+#
+# The rule is a deterministic baseline and one input to the hard rules. One keyword per
+# line; matching is case-insensitive over the published narrative and returns the exact
+# span that matched. Multi-word keywords match their words in order with any whitespace
+# between them. Blank lines and lines starting with "#" are ignored.
+#
+# Selection: words that describe a crash, fire, injury or fatality, or a burn/shock that
+# can precede one. Deliberately short and generic so it is not tuned to the eval set.
+crash
+crashed
+crashing
+collision
+collided
+impact
+fire
+caught fire
+smoke
+smoking
+burn
+burned
+burning
+flames
+explosion
+exploded
+electric shock
+injury
+injured
+injuries
+fatal
+fatality
+death
+died

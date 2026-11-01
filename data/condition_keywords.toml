@@ -1,0 +1,107 @@
+# condition_keywords.toml -- deterministic keyword rule for the condition kinds.
+# Committed by R1 before any model result exists, so the baseline cannot be tuned to a
+# model's answers. Read as `tomllib.load(path)["conditions"]`; every key is a
+# ConditionKind value from contracts.py and every value is a list of lowercase phrases.
+#
+# Matching is case-insensitive over the published narrative; a phrase matches its words
+# in order with any whitespace between them. The R6 baseline reports agreement with the
+# extracted conditions, never accuracy, because there is no ground truth.
+
+[conditions]
+moisture = [
+  "rain",
+  "raining",
+  "wet",
+  "water",
+  "leak",
+  "leaking",
+  "moisture",
+  "condensation",
+  "humidity",
+  "car wash",
+  "snow",
+  "snowy",
+]
+cold = [
+  "cold",
+  "freezing",
+  "frozen",
+  "frost",
+  "winter",
+  "low temperature",
+  "below zero",
+]
+heat = [
+  "hot",
+  "heat",
+  "heated",
+  "overheat",
+  "overheated",
+  "overheating",
+  "high temperature",
+  "summer",
+  "sun",
+  "direct sunlight",
+]
+vibration_or_road = [
+  "vibration",
+  "vibrates",
+  "vibrating",
+  "shakes",
+  "shaking",
+  "rough road",
+  "bumpy road",
+  "pothole",
+  "gravel",
+  "speed bump",
+]
+after_service = [
+  "after service",
+  "after the service",
+  "after repair",
+  "after the repair",
+  "after replacement",
+  "after replacing",
+  "after installation",
+  "after installing",
+  "just installed",
+  "new battery",
+  "dealer replaced",
+  "mechanic replaced",
+]
+charging = [
+  "charging",
+  "charger",
+  "plugged in",
+  "plug in",
+  "charging station",
+  "fast charge",
+  "charge port",
+]
+speed_or_load = [
+  "highway",
+  "high speed",
+  "at speed",
+  "accelerating",
+  "acceleration",
+  "under load",
+  "uphill",
+  "towing",
+  "heavy load",
+]
+startup = [
+  "start up",
+  "startup",
+  "when starting",
+  "when i start",
+  "cold start",
+  "turned on",
+  "turning on",
+  "first start",
+]
+other = [
+  "sometimes",
+  "intermittent",
+  "randomly",
+  "occasionally",
+]
