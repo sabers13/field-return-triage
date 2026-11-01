@@ -81,8 +81,11 @@ count.
 | Recall rows parsed | 247021 |  |
 | Vehicle recall rows | 220284 | 89.2% |
 | Mapped recall rows | 77939 | 35.4% |
+| Mapped recall rows in recalls.csv | 77936 |  |
 | Vehicle recall campaigns | 13731 |  |
 | Mapped recall campaigns | 3487 | 25.4% |
 
 The mapped share is reported, not forced: the unmapped rows name components with
 no prefix in `data/groups.toml` (mostly mechanical, tyre and equipment families).
+A mapped row with model year 9999 has no usable series key and is not written to
+`data/trend/recalls.csv`; that is the only difference between the two mapped counts.

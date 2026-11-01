@@ -36,6 +36,7 @@ class StatsInput:
     eval_items: Sequence[Complaint]
     test_pool: Sequence[dict[str, Any]]
     recalls: RecallResolutionStats
+    recalls_written: int
 
 
 def _pct(numerator: int, denominator: int) -> str:
@@ -204,6 +205,7 @@ def build_stats(source: StatsInput) -> str:
             ("Recall rows parsed", recalls.parsed_rows, ""),
             ("Vehicle recall rows", recalls.vehicle_rows, _pct(recalls.vehicle_rows, recalls.parsed_rows)),
             ("Mapped recall rows", recalls.mapped_rows, _pct(recalls.mapped_rows, recalls.vehicle_rows)),
+            ("Mapped recall rows in recalls.csv", source.recalls_written, ""),
             ("Vehicle recall campaigns", recalls.vehicle_campaigns, ""),
             (
                 "Mapped recall campaigns",
@@ -216,6 +218,8 @@ def build_stats(source: StatsInput) -> str:
         "",
         "The mapped share is reported, not forced: the unmapped rows name components with",
         "no prefix in `data/groups.toml` (mostly mechanical, tyre and equipment families).",
+        "A mapped row with model year 9999 has no usable series key and is not written to",
+        "`data/trend/recalls.csv`; that is the only difference between the two mapped counts.",
         "",
     ]
     return "\n".join(lines)

@@ -184,6 +184,7 @@ def data_main() -> None:
             eval_items=eval_items,
             test_pool=test_pool,
             recalls=recall_stats,
+            recalls_written=len(recalls),
         )
     )
     STATS_PATH.write_text(stats, encoding="utf-8")

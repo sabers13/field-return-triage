@@ -42,6 +42,7 @@ def _source() -> StatsInput:
             vehicle_campaigns=10,
             mapped_campaigns=5,
         ),
+        recalls_written=44,
     )
 
 
