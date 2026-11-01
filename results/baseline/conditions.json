@@ -1,0 +1,23 @@
+{
+  "any_condition_share": {
+    "ci_high": 0.818808175898918,
+    "ci_low": 0.43285427668523624,
+    "value": 0.65
+  },
+  "available": true,
+  "evaluation_items": 20,
+  "items_with_any_condition": 13,
+  "method": "committed condition keyword rule",
+  "note": "coverage of the rule only; agreement with a model is not accuracy",
+  "per_kind": {
+    "after_service": 1,
+    "charging": 2,
+    "cold": 2,
+    "heat": 2,
+    "moisture": 3,
+    "other": 3,
+    "speed_or_load": 1,
+    "startup": 0,
+    "vibration_or_road": 2
+  }
+}

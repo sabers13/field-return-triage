@@ -1,0 +1,1422 @@
+{
+  "alerts": {
+    "median_lead_days": 70.0,
+    "note": null,
+    "preceding_recall": 35,
+    "share": 0.376344,
+    "total": 93,
+    "weak_join": false
+  },
+  "base_rate": {
+    "ci95": {
+      "high": 0.422987,
+      "low": 0.236249
+    },
+    "draws": 93,
+    "preceding_recall": 30,
+    "seed": 20261031,
+    "share": 0.322581
+  },
+  "method": {
+    "base_rate": "one random evaluated week of the same series per alert, fixed seed",
+    "recall_window_days": 365,
+    "rule": "count >= 3 and count > Poisson 99.9% upper limit of the trailing 26-week mean (floored at 0.5)"
+  },
+  "per_alert": [
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "exterior_lighting",
+        "make": "ACURA",
+        "model": "RDX",
+        "model_year": 2013
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-02-27"
+    },
+    {
+      "count": 11,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "exterior_lighting",
+        "make": "ACURA",
+        "model": "RDX",
+        "model_year": 2015
+      },
+      "threshold": 7.0,
+      "trailing_mean": 1.846154,
+      "week": "2023-02-27"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "ACURA",
+        "model": "RDX",
+        "model_year": 2019
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-01-20"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "BUICK",
+        "model": "ENCLAVE",
+        "model_year": 2014
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-06-26"
+    },
+    {
+      "count": 9,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "BUICK",
+        "model": "ENCLAVE",
+        "model_year": 2017
+      },
+      "threshold": 7.0,
+      "trailing_mean": 1.615385,
+      "week": "2024-04-29"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "exterior_lighting",
+        "make": "CADILLAC",
+        "model": "SRX",
+        "model_year": 2015
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.576923,
+      "week": "2020-11-30"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2014
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.923077,
+      "week": "2023-09-11"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2015
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-06-26"
+    },
+    {
+      "count": 8,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2015
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-07-03"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2015
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.769231,
+      "week": "2023-07-24"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2016
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-07-03"
+    },
+    {
+      "count": 8,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2016
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-07-10"
+    },
+    {
+      "count": 8,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2017
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-06-26"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2017
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-07-03"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2017
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.653846,
+      "week": "2023-07-10"
+    },
+    {
+      "count": 7,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "CHEVROLET",
+        "model": "TRAVERSE",
+        "model_year": 2017
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.923077,
+      "week": "2023-08-07"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "DODGE",
+        "model": "CHARGER",
+        "model_year": 2019
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2024-11-18"
+    },
+    {
+      "count": 8,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "exterior_lighting",
+        "make": "DODGE",
+        "model": "DURANGO",
+        "model_year": 2021
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2026-08-24"
+    },
+    {
+      "count": 11,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "FISKER",
+        "model": "OCEAN",
+        "model_year": 2023
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-02-10"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "FISKER",
+        "model": "OCEAN",
+        "model_year": 2023
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.615385,
+      "week": "2025-02-17"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "FORD",
+        "model": "BRONCO",
+        "model_year": 2022
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.615385,
+      "week": "2023-02-06"
+    },
+    {
+      "count": 9,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "FORD",
+        "model": "BRONCO",
+        "model_year": 2022
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.846154,
+      "week": "2023-02-13"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "FORD",
+        "model": "ESCAPE",
+        "model_year": 2015
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.923077,
+      "week": "2026-03-09"
+    },
+    {
+      "count": 7,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "FORD",
+        "model": "EXPLORER",
+        "model_year": 2015
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.461538,
+      "week": "2026-10-05"
+    },
+    {
+      "count": 5,
+      "lead_days": 88,
+      "recall_id": "25V515000",
+      "report_date": "2025-08-08",
+      "series": {
+        "group": "exterior_lighting",
+        "make": "FORD",
+        "model": "F-150",
+        "model_year": 2022
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-05-12"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "FORD",
+        "model": "MUSTANG MACH E",
+        "model_year": 2021
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-10-17"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "GMC",
+        "model": "ACADIA",
+        "model_year": 2015
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2023-07-03"
+    },
+    {
+      "count": 5,
+      "lead_days": 74,
+      "recall_id": "21V050000",
+      "report_date": "2021-02-05",
+      "series": {
+        "group": "airbags",
+        "make": "GMC",
+        "model": "SIERRA 1500",
+        "model_year": 2008
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2020-11-23"
+    },
+    {
+      "count": 10,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "ACCORD",
+        "model_year": 2018
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-02-21"
+    },
+    {
+      "count": 9,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "ACCORD",
+        "model_year": 2018
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.730769,
+      "week": "2022-02-28"
+    },
+    {
+      "count": 7,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "ACCORD",
+        "model_year": 2018
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.615385,
+      "week": "2023-03-13"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "ACCORD",
+        "model_year": 2018
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2024-04-15"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "ACCORD",
+        "model_year": 2019
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-02-28"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "ACCORD",
+        "model_year": 2020
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2024-04-15"
+    },
+    {
+      "count": 7,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "ACCORD",
+        "model_year": 2020
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-09-15"
+    },
+    {
+      "count": 7,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_year": 2017
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-02-21"
+    },
+    {
+      "count": 10,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_year": 2017
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-02-28"
+    },
+    {
+      "count": 10,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_year": 2018
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-02-21"
+    },
+    {
+      "count": 15,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_year": 2018
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.769231,
+      "week": "2022-02-28"
+    },
+    {
+      "count": 7,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_year": 2018
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.384615,
+      "week": "2022-03-14"
+    },
+    {
+      "count": 15,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_year": 2019
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-02-21"
+    },
+    {
+      "count": 9,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_year": 2019
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.884615,
+      "week": "2022-02-28"
+    },
+    {
+      "count": 5,
+      "lead_days": 262,
+      "recall_id": "26V332000",
+      "report_date": "2026-05-21",
+      "series": {
+        "group": "airbags",
+        "make": "HONDA",
+        "model": "CR-V",
+        "model_year": 2020
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-09-01"
+    },
+    {
+      "count": 12,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "HONDA",
+        "model": "HR-V",
+        "model_year": 2023
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.346154,
+      "week": "2023-09-11"
+    },
+    {
+      "count": 10,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "HONDA",
+        "model": "HR-V",
+        "model_year": 2023
+      },
+      "threshold": 7.0,
+      "trailing_mean": 1.769231,
+      "week": "2023-09-18"
+    },
+    {
+      "count": 11,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "HONDA",
+        "model": "HR-V",
+        "model_year": 2023
+      },
+      "threshold": 8.0,
+      "trailing_mean": 2.153846,
+      "week": "2023-09-25"
+    },
+    {
+      "count": 10,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "HONDA",
+        "model": "HR-V",
+        "model_year": 2023
+      },
+      "threshold": 9.0,
+      "trailing_mean": 2.923077,
+      "week": "2023-10-09"
+    },
+    {
+      "count": 12,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "HONDA",
+        "model": "HR-V",
+        "model_year": 2023
+      },
+      "threshold": 11.0,
+      "trailing_mean": 4.0,
+      "week": "2023-10-30"
+    },
+    {
+      "count": 7,
+      "lead_days": 268,
+      "recall_id": "26V423000",
+      "report_date": "2026-07-01",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "ODYSSEY",
+        "model_year": 2018
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.884615,
+      "week": "2025-10-06"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "PASSPORT",
+        "model_year": 2021
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2024-04-15"
+    },
+    {
+      "count": 6,
+      "lead_days": 73,
+      "recall_id": "26V112000",
+      "report_date": "2026-02-26",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HONDA",
+        "model": "PROLOGUE",
+        "model_year": 2024
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-12-15"
+    },
+    {
+      "count": 10,
+      "lead_days": 28,
+      "recall_id": "26V316000",
+      "report_date": "2026-05-18",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "HYUNDAI",
+        "model": "TUCSON",
+        "model_year": 2025
+      },
+      "threshold": 7.0,
+      "trailing_mean": 1.576923,
+      "week": "2026-04-20"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "exterior_lighting",
+        "make": "KIA",
+        "model": "TELLURIDE",
+        "model_year": 2020
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.653846,
+      "week": "2023-01-30"
+    },
+    {
+      "count": 6,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "exterior_lighting",
+        "make": "KIA",
+        "model": "TELLURIDE",
+        "model_year": 2020
+      },
+      "threshold": 5.0,
+      "trailing_mean": 1.038462,
+      "week": "2023-02-20"
+    },
+    {
+      "count": 19,
+      "lead_days": 84,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2021
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-06-23"
+    },
+    {
+      "count": 9,
+      "lead_days": 77,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2021
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.192308,
+      "week": "2025-06-30"
+    },
+    {
+      "count": 22,
+      "lead_days": 70,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2021
+      },
+      "threshold": 7.0,
+      "trailing_mean": 1.538462,
+      "week": "2025-07-07"
+    },
+    {
+      "count": 10,
+      "lead_days": 53,
+      "recall_id": "25V280000",
+      "report_date": "2025-04-25",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2022
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-03-03"
+    },
+    {
+      "count": 6,
+      "lead_days": 91,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2022
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.961538,
+      "week": "2025-06-16"
+    },
+    {
+      "count": 45,
+      "lead_days": 84,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2022
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.192308,
+      "week": "2025-06-23"
+    },
+    {
+      "count": 15,
+      "lead_days": 77,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2022
+      },
+      "threshold": 9.0,
+      "trailing_mean": 2.923077,
+      "week": "2025-06-30"
+    },
+    {
+      "count": 43,
+      "lead_days": 70,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2022
+      },
+      "threshold": 11.0,
+      "trailing_mean": 3.5,
+      "week": "2025-07-07"
+    },
+    {
+      "count": 5,
+      "lead_days": 91,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2023
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2025-06-16"
+    },
+    {
+      "count": 18,
+      "lead_days": 84,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2023
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.538462,
+      "week": "2025-06-23"
+    },
+    {
+      "count": 8,
+      "lead_days": 77,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2023
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.230769,
+      "week": "2025-06-30"
+    },
+    {
+      "count": 19,
+      "lead_days": 70,
+      "recall_id": "25V615000",
+      "report_date": "2025-09-15",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "POLESTAR",
+        "model": "POLESTAR 2",
+        "model_year": 2023
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.5,
+      "week": "2025-07-07"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "RAM",
+        "model": "1500",
+        "model_year": 2025
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2026-09-14"
+    },
+    {
+      "count": 7,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "SUBARU",
+        "model": "FORESTER",
+        "model_year": 2019
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.307692,
+      "week": "2020-11-23"
+    },
+    {
+      "count": 7,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "SUBARU",
+        "model": "OUTBACK",
+        "model_year": 2017
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.769231,
+      "week": "2020-11-23"
+    },
+    {
+      "count": 11,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "wipers_washers",
+        "make": "SUBARU",
+        "model": "OUTBACK",
+        "model_year": 2018
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.961538,
+      "week": "2020-11-23"
+    },
+    {
+      "count": 8,
+      "lead_days": 32,
+      "recall_id": "22V169000",
+      "report_date": "2022-03-18",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2018
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-02-14"
+    },
+    {
+      "count": 8,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2018
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.884615,
+      "week": "2022-05-30"
+    },
+    {
+      "count": 10,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2019
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.807692,
+      "week": "2022-07-11"
+    },
+    {
+      "count": 16,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2019
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.192308,
+      "week": "2022-07-18"
+    },
+    {
+      "count": 8,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2019
+      },
+      "threshold": 7.0,
+      "trailing_mean": 1.769231,
+      "week": "2022-07-25"
+    },
+    {
+      "count": 6,
+      "lead_days": 4,
+      "recall_id": "22V063000",
+      "report_date": "2022-02-04",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2020
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-01-31"
+    },
+    {
+      "count": 9,
+      "lead_days": 32,
+      "recall_id": "22V169000",
+      "report_date": "2022-03-18",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2020
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2022-02-14"
+    },
+    {
+      "count": 8,
+      "lead_days": 81,
+      "recall_id": "22V063000",
+      "report_date": "2022-02-04",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2021
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2021-11-15"
+    },
+    {
+      "count": 5,
+      "lead_days": 74,
+      "recall_id": "22V063000",
+      "report_date": "2022-02-04",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2021
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.615385,
+      "week": "2021-11-22"
+    },
+    {
+      "count": 33,
+      "lead_days": 4,
+      "recall_id": "22V063000",
+      "report_date": "2022-02-04",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2021
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.115385,
+      "week": "2022-01-31"
+    },
+    {
+      "count": 11,
+      "lead_days": 64,
+      "recall_id": "22V235000",
+      "report_date": "2022-04-12",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2021
+      },
+      "threshold": 8.0,
+      "trailing_mean": 2.384615,
+      "week": "2022-02-07"
+    },
+    {
+      "count": 29,
+      "lead_days": 57,
+      "recall_id": "22V235000",
+      "report_date": "2022-04-12",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2021
+      },
+      "threshold": 9.0,
+      "trailing_mean": 2.807692,
+      "week": "2022-02-14"
+    },
+    {
+      "count": 6,
+      "lead_days": 162,
+      "recall_id": "23V838000",
+      "report_date": "2023-12-12",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL 3",
+        "model_year": 2023
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.846154,
+      "week": "2023-07-03"
+    },
+    {
+      "count": 7,
+      "lead_days": 81,
+      "recall_id": "22V063000",
+      "report_date": "2022-02-04",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_year": 2021
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2021-11-15"
+    },
+    {
+      "count": 7,
+      "lead_days": 67,
+      "recall_id": "22V063000",
+      "report_date": "2022-02-04",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_year": 2021
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.846154,
+      "week": "2021-11-29"
+    },
+    {
+      "count": 53,
+      "lead_days": 4,
+      "recall_id": "22V063000",
+      "report_date": "2022-02-04",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_year": 2021
+      },
+      "threshold": 7.0,
+      "trailing_mean": 1.653846,
+      "week": "2022-01-31"
+    },
+    {
+      "count": 39,
+      "lead_days": 57,
+      "recall_id": "22V235000",
+      "report_date": "2022-04-12",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_year": 2021
+      },
+      "threshold": 11.0,
+      "trailing_mean": 4.0,
+      "week": "2022-02-14"
+    },
+    {
+      "count": 19,
+      "lead_days": 50,
+      "recall_id": "22V235000",
+      "report_date": "2022-04-12",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_year": 2021
+      },
+      "threshold": 14.0,
+      "trailing_mean": 5.5,
+      "week": "2022-02-21"
+    },
+    {
+      "count": 10,
+      "lead_days": 28,
+      "recall_id": "25V002000",
+      "report_date": "2025-01-06",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_year": 2024
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2024-12-09"
+    },
+    {
+      "count": 28,
+      "lead_days": 21,
+      "recall_id": "25V002000",
+      "report_date": "2025-01-06",
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_year": 2024
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.807692,
+      "week": "2024-12-16"
+    },
+    {
+      "count": 8,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "driver_assist_sensors",
+        "make": "TESLA",
+        "model": "MODEL Y",
+        "model_year": 2026
+      },
+      "threshold": 6.0,
+      "trailing_mean": 1.384615,
+      "week": "2026-08-03"
+    },
+    {
+      "count": 5,
+      "lead_days": null,
+      "recall_id": null,
+      "report_date": null,
+      "series": {
+        "group": "airbags",
+        "make": "TOYOTA",
+        "model": "RAV4",
+        "model_year": 2020
+      },
+      "threshold": 4.0,
+      "trailing_mean": 0.5,
+      "week": "2024-09-09"
+    },
+    {
+      "count": 6,
+      "lead_days": 51,
+      "recall_id": "23V671000",
+      "report_date": "2023-10-04",
+      "series": {
+        "group": "airbags",
+        "make": "VOLKSWAGEN",
+        "model": "ATLAS",
+        "model_year": 2019
+      },
+      "threshold": 5.0,
+      "trailing_mean": 0.884615,
+      "week": "2023-08-14"
+    }
+  ]
+}

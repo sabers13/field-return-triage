@@ -1,0 +1,19 @@
+{
+  "available": true,
+  "coded_safety_items": 1,
+  "evaluation_items": 20,
+  "method": "committed safety keyword rule",
+  "metrics": {
+    "precision": {
+      "ci_high": 0.6244653702374747,
+      "ci_low": 0.03622410863243014,
+      "value": 0.2
+    },
+    "recall": {
+      "ci_high": 1.0,
+      "ci_low": 0.20654931437723745,
+      "value": 1.0
+    }
+  },
+  "predicted_safety_items": 5
+}
