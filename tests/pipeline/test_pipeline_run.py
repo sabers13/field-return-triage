@@ -247,6 +247,7 @@ def test_policy_stop_keeps_partial_cards_and_writes_the_notice(tmp_path: Path) -
             recordings_path=tmp_path / "recordings",
             prices_path=prices,
             index=([], None),  # type: ignore[arg-type]
+            clock=fake_clock(0.5),
             client_factory=factory,  # type: ignore[arg-type]
         )
 
