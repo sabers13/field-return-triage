@@ -22,10 +22,10 @@ setup: ## Create the venv and install exact locked versions
 	uv sync
 
 fetch-data: ## Download the NHTSA snapshot into data/raw/ (lane R1)
-	@echo "fetch-data: not built yet (lane R1)"; exit 1
+	uv run python scripts/fetch_nhtsa.py
 
 data: ## Derive the library, eval set and trend tables (lane R1)
-	@echo "data: not built yet (lane R1)"; exit 1
+	uv run python -m field_return_triage.data.cli
 
 index: ## Embed the library into the local vector cache (lane R3)
 	uv run --extra index python -m field_return_triage.similar.cli

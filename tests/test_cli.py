@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 from typer.testing import CliRunner, Result
 
 from field_return_triage import __version__
@@ -37,13 +36,6 @@ def test_help_lists_every_lane_command() -> None:
     assert result.exit_code == 0
     for command in STUBBED:
         assert command in result.output
-
-
-@pytest.mark.parametrize(("command", "args"), [("data", [])])
-def test_simple_stubs_name_their_lane(command: str, args: list[str]) -> None:
-    result = runner.invoke(app, [command, *args])
-    assert result.exit_code == 2
-    assert f"not built yet (lane {STUBBED[command]})" in combined_output(result)
 
 
 def test_triage_takes_a_file_or_stdin_and_names_lane_r6(tmp_path: Path) -> None:
