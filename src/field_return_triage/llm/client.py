@@ -43,10 +43,24 @@ from field_return_triage.llm.record import Recorder, recording_key, recording_pa
 from field_return_triage.llm.reply import ModelReply
 from field_return_triage.llm.settings import BUDGET_PATH, Budget, load_budget
 
-__all__ = ["USER_AGENT", "ChatClient", "Message", "ModelReply", "retry_after_seconds"]
+__all__ = [
+    "REASONING_EFFORT",
+    "USER_AGENT",
+    "ChatClient",
+    "Message",
+    "ModelReply",
+    "retry_after_seconds",
+]
 
 #: The client identifies itself, as the Go docs require (not a bare HTTP-library name).
 USER_AGENT = "field-return-triage/1.0 (+https://github.com/sabers13/field-return-triage)"
+
+#: Reasoning effort per gateway model that reasons before it answers. Without a cap
+#: such a model spends the whole ``max_tokens`` allowance on hidden reasoning and
+#: returns empty or cut-off content (R7 probe, PLAN.md section 7). ``low`` still
+#: reasons enough to answer: about 800 output tokens per extraction. Models not
+#: listed here never get the parameter, so a plain chat model sees the plain request.
+REASONING_EFFORT: dict[str, str] = {"muse-spark-1.3-contributor": "low"}
 
 #: Appended to ``ModelSetting.base_url``.
 CHAT_PATH = "/chat/completions"
@@ -244,6 +258,9 @@ class ChatClient:
             "temperature": self.settings.temperature,
             "max_tokens": self.settings.max_output_tokens,
         }
+        effort = REASONING_EFFORT.get(self.settings.model_id)
+        if effort is not None:
+            body["reasoning_effort"] = effort
         if schema is not None:
             if self._json_schema_supported is False:
                 body["response_format"] = {"type": "json_object"}

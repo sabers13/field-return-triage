@@ -90,6 +90,41 @@ def test_success_sends_the_documented_request(
     assert body["response_format"]["json_schema"]["name"] == "ExtractionAnswer"
 
 
+def test_a_reasoning_model_gets_a_capped_effort(
+    api_key: str,
+    budget_path: Path,
+    prices_path: Path,
+    tmp_path: Path,
+) -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return json_response(completion("{}"))
+
+    reasoning = ModelSetting(role="primary", model_id="muse-spark-1.3-contributor")
+    client = make_client(
+        reasoning,
+        handler,
+        tmp_path=tmp_path,
+        budget_path=budget_path,
+        prices_path=prices_path,
+    )
+    client.complete(MESSAGES, schema=ExtractionAnswer)
+    assert request_json(seen[0])["reasoning_effort"] == "low"
+
+    plain = ModelSetting(role="comparison", model_id="gemini-4-argon")
+    client = make_client(
+        plain,
+        handler,
+        tmp_path=tmp_path,
+        budget_path=budget_path,
+        prices_path=prices_path,
+    )
+    client.complete(MESSAGES, schema=ExtractionAnswer)
+    assert "reasoning_effort" not in request_json(seen[1])
+
+
 def test_gateway_list_cost_wins_over_tokens(
     settings: ModelSetting,
     api_key: str,

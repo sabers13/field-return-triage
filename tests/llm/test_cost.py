@@ -41,6 +41,7 @@ def test_estimate_refuses_an_unpriced_model(prices_path: Path) -> None:
 
 
 def test_gateway_cost_fields() -> None:
+    assert gateway_cost_usd({"usage": {"opencode": {"list_cost": 0.00143}}}) == 0.00143
     assert gateway_cost_usd({"cost_usd": 0.5}) == 0.5
     assert gateway_cost_usd({"usage": {"cost": 0.25}}) == 0.25
     assert gateway_cost_usd({"usage": {"total_cost": 0.125}}) == 0.125

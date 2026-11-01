@@ -35,8 +35,11 @@ PRICES_PATH: Path = Path("config/prices.toml")
 #: Conservative prompt size per item used only by the pre-run estimate.
 ESTIMATED_INPUT_TOKENS_PER_ITEM = 1_000
 
-#: Response fields that can carry a USD list cost, most specific first.
+#: Response fields that can carry a USD list cost, most specific first. The Go gateway
+#: reports the USD amount per response under ``usage.opencode.list_cost`` (it equals
+#: tokens x list price), so that is read before the generic fields.
 _COST_KEYS: tuple[tuple[str, ...], ...] = (
+    ("usage", "opencode", "list_cost"),
     ("cost_usd",),
     ("list_cost",),
     ("total_cost",),
