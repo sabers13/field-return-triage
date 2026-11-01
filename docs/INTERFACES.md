@@ -538,7 +538,7 @@ def run_eval(
 
 # pipeline/metrics.py
 class Metric(BaseModel):
-    value: float
+    value: float | None = None  # None when the denominator is zero
     ci_low: float | None = None
     ci_high: float | None = None
 
@@ -548,8 +548,8 @@ def bootstrap_ci(values: Sequence[float], *, resamples: int = 2_000, seed: int =
 def safety_scores(cards: Sequence[TriageCard], items: Sequence[Complaint]) -> dict[str, Metric]: ...
 def quote_grounding(cards: Sequence[TriageCard]) -> Metric: ...
 def condition_agreement(cards: Sequence[TriageCard], keywords: ...) -> Metric: ...
-def routing(cards: Sequence[TriageCard]) -> dict[str, float]: ...
-def latency_ms(durations: Sequence[float]) -> dict[str, float]: ...
+def routing(cards: Sequence[TriageCard]) -> dict[str, Metric]: ...
+def latency_ms(durations: Sequence[float]) -> dict[str, Metric]: ...
 
 
 # pipeline/baseline.py
@@ -558,9 +558,24 @@ def run_baselines(items: Sequence[Complaint], library: Sequence[Complaint]) -> d
 
 `triage_main` reads a file or stdin and prints JSON plus a readable text view.
 `eval_main` maps `--mode` to `RunMode`, requires `FRT_ENV_FILE` or `.env` only in record
-mode, and writes `results/runs/<id>/{manifest.json,cards.jsonl,metrics.json}`.
+mode, and writes `results/runs/<id>/{manifest.json,cards.jsonl,metrics.json}`. R6 adds
+`--models FILE` and `--run-id ID` to the `frt eval` command, plus these keyword-only
+`run_eval` parameters with defaults: `library_path`, `groups_path`, `recordings_path`,
+`prices_path`, `checksums_path`, `index`, `embedder`, `clock`, `wall_clock` and
+`client_factory` (tests inject them; production passes none).
+
+Record mode appends one row per call to `<recordings>/calls.jsonl` with the run id, cost
+and duration; replay reads that sidecar so a reduced run is reproduced exactly and the
+frozen recordings still hold content and usage only. `triage_item` is the shared
+implementation and also returns the call's usage/cost/duration; `triage_one` keeps the
+signature above. Before `config/models.lock.toml` exists, the pipeline runs in fixture
+mode on `tests/fixtures/recordings/` and says so on every command line and in
+`results/SUMMARY.md`.
+
 `make all` = data check → index (cached) → trend → results (replay) → page-data → page,
-and is byte-identical twice.
+and is byte-identical twice. Until R8 lands the report package, `make all` stops after
+`results` with a one-line note; it runs the page targets automatically as soon as
+`src/field_return_triage/report/` exists.
 
 ## 9. R8 — `field_return_triage.report`
 

@@ -1,8 +1,6 @@
-"""The CLI ships as stubs: every command must name its lane and exit non-zero."""
+"""The CLI command tree: every lane command is listed and its options are wired."""
 
 from __future__ import annotations
-
-from pathlib import Path
 
 from typer.testing import CliRunner, Result
 
@@ -11,13 +9,14 @@ from field_return_triage.cli import app
 
 runner = CliRunner()
 
-#: command -> lane that will replace the stub.
-STUBBED = {
+#: Every command the CLI must list, and the lane that owns it.
+COMMANDS = {
     "data": "R1",
     "index": "R3",
     "triage": "R6",
     "eval": "R6",
     "review": "R4",
+    "trend": "R5",
 }
 
 
@@ -34,24 +33,16 @@ def test_version_prints_and_exits_zero() -> None:
 def test_help_lists_every_lane_command() -> None:
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
-    for command in STUBBED:
+    for command in COMMANDS:
         assert command in result.output
 
 
-def test_triage_takes_a_file_or_stdin_and_names_lane_r6(tmp_path: Path) -> None:
-    complaint = tmp_path / "complaint.txt"
-    complaint.write_text("The dashboard went dark after rain.\n", encoding="utf-8")
-    for source in (str(complaint), "-"):
-        result = runner.invoke(app, ["triage", source])
-        assert result.exit_code == 2
-        assert "not built yet (lane R6)" in combined_output(result)
-
-
-def test_eval_defaults_to_replay_and_accepts_record() -> None:
-    for args in (["eval"], ["eval", "--mode", "record"], ["eval", "--mode", "replay"]):
-        result = runner.invoke(app, args)
-        assert result.exit_code == 2
-        assert "not built yet (lane R6)" in combined_output(result)
+def test_eval_lists_its_models_and_run_id_options() -> None:
+    result = runner.invoke(app, ["eval", "--help"])
+    assert result.exit_code == 0
+    assert "--models" in result.output
+    assert "--run-id" in result.output
+    assert "--mode" in result.output
 
 
 def test_eval_rejects_an_unknown_mode() -> None:

@@ -117,9 +117,21 @@ def evaluate(
         "--mode",
         help="replay committed recordings (no network) or record new answers.",
     ),
+    models: str | None = typer.Option(
+        None,
+        "--models",
+        metavar="FILE",
+        help="Model lock file (default: config/models.lock.toml).",
+    ),
+    run_id: str | None = typer.Option(
+        None,
+        "--run-id",
+        metavar="ID",
+        help="Results directory name under results/runs/.",
+    ),
 ) -> None:
     """Run the evaluation set through the pipeline (lane R6)."""
-    _dispatch("eval", mode.value)
+    _dispatch("eval", mode.value, models, run_id)
 
 
 @app.command()

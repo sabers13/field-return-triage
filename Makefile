@@ -10,7 +10,7 @@ SHELL := /bin/bash
 PYTHON := uv run python
 PYTEST := uv run pytest
 
-.PHONY: help setup fetch-data data index test lint format typecheck scan-forbidden \
+.PHONY: help setup fetch-data data data-check index index-cached test lint format typecheck scan-forbidden \
         scan-secrets facts eval-replay live trend results page-data page all \
         release-check clean
 
@@ -27,8 +27,14 @@ fetch-data: ## Download the NHTSA snapshot into data/raw/ (lane R1)
 data: ## Derive the library, eval set and trend tables (lane R1)
 	uv run python -m field_return_triage.data.cli
 
+data-check: ## Verify the committed data against data/CHECKSUMS.txt (lane R6)
+	uv run python -m field_return_triage.pipeline.cli data-check
+
 index: ## Embed the library into the local vector cache (lane R3)
 	uv run --extra index python -m field_return_triage.similar.cli
+
+index-cached: ## Reuse the embedding index, build it only when missing (lane R6)
+	uv run python -m field_return_triage.pipeline.cli index-cached
 
 test: ## Run the test suite with the network blocked
 	$(PYTEST) -q
@@ -54,7 +60,7 @@ facts: ## Check every published number against the results file that proves it
 	$(PYTHON) scripts/check_facts.py
 
 eval-replay: ## Score the eval set from committed recordings (lane R6)
-	@echo "eval-replay: not built yet (lane R6)"; exit 1
+	uv run python -m field_return_triage.pipeline.cli eval-replay
 
 live: ## The one paid run; needs a key and the budget (lane R7)
 	@echo "live: not built yet (lane R7)"; exit 1
@@ -63,7 +69,7 @@ trend: ## Detect weekly spikes and backtest them against recalls (lane R5)
 	uv run python -m field_return_triage.trend.cli
 
 results: ## Export results and the summary from replay (lane R6)
-	@echo "results: not built yet (lane R6)"; exit 1
+	uv run python -m field_return_triage.pipeline.cli results
 
 page-data: ## Build results/page/page-data.json (lane R8)
 	@echo "page-data: not built yet (lane R8)"; exit 1
@@ -71,8 +77,12 @@ page-data: ## Build results/page/page-data.json (lane R8)
 page: ## Build dist/field-return-triage/index.html (lane R8)
 	@echo "page: not built yet (lane R8)"; exit 1
 
-all: ## Rebuild everything in replay mode (lane R6)
-	@echo "all: not built yet (lane R6)"; exit 1
+all: data-check index-cached trend results ## Rebuild everything in replay mode (lane R6)
+	@if [ -d src/field_return_triage/report ]; then \
+		$(MAKE) page-data page; \
+	else \
+		echo "all: results are ready; page-data/page wait for lane R8"; \
+	fi
 
 release-check: lint typecheck test scan-forbidden scan-secrets facts ## CI gate
 	@test -f LICENSE && grep -q "MIT License" LICENSE || { echo "LICENSE (MIT) missing"; exit 1; }
