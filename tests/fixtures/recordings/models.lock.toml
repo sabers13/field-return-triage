@@ -1,0 +1,18 @@
+# R6 fixture model lock: two fake models, used only until R7 writes the real lock.
+# The recordings in this directory are hand-made, not gateway responses.
+
+[[models]]
+role = "primary"
+model_id = "fixture-primary"
+provider = "fixture"
+base_url = "https://example.invalid/v1"
+temperature = 0.0
+max_output_tokens = 1024
+
+[[models]]
+role = "comparison"
+model_id = "fixture-comparison"
+provider = "fixture"
+base_url = "https://example.invalid/v1"
+temperature = 0.0
+max_output_tokens = 1024
