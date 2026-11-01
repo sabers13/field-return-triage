@@ -15,7 +15,15 @@ from field_return_triage.pipeline.cli import app as pipeline_app
 runner = CliRunner()
 
 
-def test_triage_reads_a_file_and_prints_json_plus_text(tmp_path: Path) -> None:
+def _fixture_lock(monkeypatch: pytest.MonkeyPatch) -> None:
+    """R7 committed the real lock, so a test that wants fixtures names the fixture lock."""
+    monkeypatch.setenv("FRT_MODELS", str(FIXTURE_DIR / "models.lock.toml"))
+
+
+def test_triage_reads_a_file_and_prints_json_plus_text(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _fixture_lock(monkeypatch)
     item = next(row for row in fixture_items() if row.id == "fx-001")
     complaint = tmp_path / "complaint.txt"
     complaint.write_text(item.narrative, encoding="utf-8")
@@ -29,7 +37,8 @@ def test_triage_reads_a_file_and_prints_json_plus_text(tmp_path: Path) -> None:
     assert payload["complaint"]["id"] == "complaint"
 
 
-def test_triage_reads_stdin(tmp_path: Path) -> None:
+def test_triage_reads_stdin(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    _fixture_lock(monkeypatch)
     item = next(row for row in fixture_items() if row.id == "fx-003")
     result = runner.invoke(app, ["triage", "-"], input=item.narrative)
     assert result.exit_code == 0, result.output
@@ -68,7 +77,8 @@ def test_data_check_command_is_green() -> None:
     assert "match CHECKSUMS.txt" in result.output
 
 
-def test_index_cached_is_a_no_op_in_fixture_mode() -> None:
+def test_index_cached_is_a_no_op_in_fixture_mode(monkeypatch: pytest.MonkeyPatch) -> None:
+    _fixture_lock(monkeypatch)
     result = runner.invoke(pipeline_app, ["index-cached"])
     assert result.exit_code == 0, result.output
     assert "hashing index" in result.output

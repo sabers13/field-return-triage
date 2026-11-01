@@ -9,9 +9,15 @@
 # publish them; the pre-run estimate uses the higher price and the per-call cost uses
 # the gateway's own list cost when it reports one.
 #
-# Gemini 4 Argon is listed with an output price only, so it has no entry here:
-# estimate_cost_usd refuses a model it cannot price instead of inventing a number.
-# Add an entry together with its input price when R7 locks that model.
+# Gemini 4 Argon is priced at the 50% launch discount that runs through 2026-11-30
+# (list price 4.00 / 20.00 after that). R7 locked it as the comparison model and added
+# the entry with its input price, as the note here asked. Re-read the page on
+# 2026-11-01: the discounted price is still what the gateway bills.
+# estimate_cost_usd still refuses a model it cannot price instead of inventing a number.
+
+[models."gemini-4-argon"]
+input = 2.00
+output = 10.00
 
 [models."grok-4.7"]
 input = 2.00

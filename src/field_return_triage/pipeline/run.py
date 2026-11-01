@@ -395,7 +395,8 @@ def run_eval(
     state.run_dir.mkdir(parents=True, exist_ok=True)
     existing = load_cards(state.cards_file)
     done = {(card.model_id, card.complaint.id) for card in existing}
-    calls = _calls_for_run(read_calls(calls_path(paths.recordings)), run_id)
+    recorded = read_calls(calls_path(paths.recordings))
+    calls = _calls_for_run(recorded, run_id)
 
     budget = load_budget(budget_path)
     is_replay = mode is RunMode.REPLAY
@@ -411,9 +412,12 @@ def run_eval(
         )
     )
 
+    # The cap covers every paid call in the recordings - probes and the smoke run too,
+    # not only the rows this run id owns. Replay spends nothing, so it keeps its own run.
+    paid = calls if is_replay else recorded
     spent = sum(
         float(row["cost_usd"])
-        for row in calls.values()
+        for row in paid.values()
         if isinstance(row.get("cost_usd"), (int, float))
     )
 

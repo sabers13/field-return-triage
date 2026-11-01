@@ -11,7 +11,7 @@ PYTHON := uv run python
 PYTEST := uv run pytest
 
 .PHONY: help setup fetch-data data data-check index index-cached test lint format typecheck scan-forbidden \
-        scan-secrets facts eval-replay live trend results page-data page all \
+        scan-secrets facts eval-replay probe live trend results page-data page all \
         release-check clean
 
 help: ## Show this help
@@ -62,8 +62,11 @@ facts: ## Check every published number against the results file that proves it
 eval-replay: ## Score the eval set from committed recordings (lane R6)
 	uv run python -m field_return_triage.pipeline.cli eval-replay
 
+probe: ## One paid call per locked model; records recordings/probes.json (lane R7)
+	uv run python -m field_return_triage.pipeline.cli probe
+
 live: ## The one paid run; needs a key and the budget (lane R7)
-	@echo "live: not built yet (lane R7)"; exit 1
+	uv run python -m field_return_triage.pipeline.cli live
 
 trend: ## Detect weekly spikes and backtest them against recalls (lane R5)
 	uv run python -m field_return_triage.trend.cli
