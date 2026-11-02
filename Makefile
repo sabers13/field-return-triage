@@ -75,10 +75,10 @@ results: ## Export results and the summary from replay (lane R6)
 	uv run python -m field_return_triage.pipeline.cli results
 
 page-data: ## Build results/page/page-data.json (lane R8)
-	@echo "page-data: not built yet (lane R8)"; exit 1
+	uv run python -m field_return_triage.report.cli page-data
 
 page: ## Build dist/field-return-triage/index.html (lane R8)
-	@echo "page: not built yet (lane R8)"; exit 1
+	uv run python -m field_return_triage.report.cli page
 
 all: data-check index-cached trend results ## Rebuild everything in replay mode (lane R6)
 	@if [ -d src/field_return_triage/report ]; then \

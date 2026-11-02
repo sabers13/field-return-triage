@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Field Return Triage: read a returned part's complaint, quote the failure clues, put safety first, suggest the next test, and leave every decision to a technician. An independent project by Saber Sojudi.">
+<title>Field Return Triage — which returned parts need a closer look?</title>
+<script>
+/* Set the theme before first paint so a dark-mode reader never sees a light flash. */
+try {
+  var savedTheme = localStorage.getItem("frt-theme");
+  if (savedTheme !== "light" && savedTheme !== "dark") {
+    savedTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  document.documentElement.dataset.theme = savedTheme;
+} catch (error) {
+  /* file:// or a privacy mode can refuse storage; the default light theme stands. */
+}
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314503f'/%3E%3Cpath d='M9 16a7 7 0 1 1 2 4.9M9 16v5h5' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<!-- build:style -->
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="Field Return Triage, back to the top">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 1 2 4.9M5 12v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="brand-text">Field Return <strong>Triage</strong></span>
+    </a>
+    <nav class="main-nav" aria-label="Sections">
+      <a href="#flow">Flow</a>
+      <a href="#queue">Queue</a>
+      <a href="#results">Results</a>
+      <a href="#trend">Trend</a>
+      <a href="#limits">Limits</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn theme-btn" id="theme-toggle" type="button" aria-label="Switch to dark appearance" aria-pressed="false">
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+      <a class="icon-link" href="https://github.com/sabers13/field-return-triage" aria-label="The project on GitHub">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1-4-2-6-2m12 5v-4c0-1-.4-2-1-2 3 0 6-2 6-6 0-1-.4-2-1-3 0-1 0-2-.2-3-2 0-3 1-4 2a13 13 0 0 0-6 0C8 5 7 4 5 4c-.2 1-.2 2 0 3-1 1-1 2-1 3 0 4 3 6 6 6-.6 0-1 1-1 2v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>GitHub</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div id="top"></div>
+
+<!-- ============================================================ HERO -->
+<section class="hero wrap" aria-labelledby="hero-title">
+  <p class="eyebrow">Independent portfolio project · public NHTSA complaints</p>
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <h1 id="hero-title">Which returned parts need a closer look, <em>and which test should run first?</em></h1>
+      <p class="lead">A returned part arrives with a complaint text. The clue that would justify a targeted load test is usually buried in it — and there are too many reports to read closely.</p>
+      <dl class="hero-stats" id="hero-stats" aria-label="Project at a glance"></dl>
+    </div>
+    <aside class="rule-card" aria-label="The rule the page is built on">
+      <p class="rule-eyebrow">The rule this page is built on</p>
+      <p class="rule-lines"><span>AI suggests.</span><span>Code checks.</span><strong>A technician decides.</strong></p>
+      <p class="rule-note">No card can close, scrap or return a part. Those states do not exist in the data model.</p>
+    </aside>
+  </div>
+
+  <ol class="does-list" aria-label="What it does and what it does not do">
+    <li>
+      <span class="does-num">01</span>
+      <p><strong>It reads.</strong> Each complaint is read for the component group, safety flag, symptoms, conditions, fault codes and mileage, and every clue carries the exact words it came from; the code checks that each quote appears verbatim and drops the ones that do not.</p>
+    </li>
+    <li>
+      <span class="does-num">02</span>
+      <p><strong>It routes.</strong> Safety-relevant cases go first, similar past cases are found, the next test is suggested with its reasons and the information still missing, and weekly complaint counts are watched for unusual spikes.</p>
+    </li>
+    <li>
+      <span class="does-num">03</span>
+      <p><strong>It does not decide.</strong> It never closes, scraps or returns a part — a technician accepts or changes every case, with a reason.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- ============================================================ FLOW -->
+<section class="block wrap" id="flow" aria-labelledby="flow-title">
+  <div class="section-head">
+    <p class="eyebrow"><span>01</span> The flow</p>
+    <h2 id="flow-title">Seven steps, and only one of them is a model.</h2>
+    <p class="section-intro">The model reads the text. Code checks the quotes, applies the hard rules and runs the rulebook. A person makes the decision. That split is the point: the model is useful exactly where language is messy, and it is never trusted with the outcome.</p>
+    <ul class="legend" aria-label="Who or what performs each step">
+      <li><span class="dot dot-ai"></span>Model call</li>
+      <li><span class="dot dot-code"></span>Code</li>
+      <li><span class="dot dot-human"></span>Person</li>
+    </ul>
+  </div>
+
+  <ol class="flow" aria-label="The triage flow from complaint text to feedback log">
+    <li class="flow-step" data-actor="input">
+      <span class="flow-num">IN</span>
+      <span class="flow-tag">Input</span>
+      <h3>Complaint text</h3>
+      <p>What the customer wrote, screened for personal details before it is stored.</p>
+    </li>
+    <li class="flow-step" data-actor="ai">
+      <span class="flow-num">01</span>
+      <span class="flow-tag">Model</span>
+      <h3>Extract</h3>
+      <p>Group, safety flag, symptoms, conditions, codes and mileage — each with a quote.</p>
+    </li>
+    <li class="flow-step" data-actor="code">
+      <span class="flow-num">02</span>
+      <span class="flow-tag">Code</span>
+      <h3>Check quotes</h3>
+      <p>The quote must appear verbatim. Failing clues are dropped and counted.</p>
+    </li>
+    <li class="flow-step" data-actor="code">
+      <span class="flow-num">03</span>
+      <span class="flow-tag">Code</span>
+      <h3>Hard rules</h3>
+      <p>Safety → priority 1 and human review. Unclear or no passing clue → needs human reading.</p>
+    </li>
+    <li class="flow-step" data-actor="code">
+      <span class="flow-num">04</span>
+      <span class="flow-tag">Search</span>
+      <h3>Similar past cases</h3>
+      <p>The nearest past complaints, with their component groups for comparison.</p>
+    </li>
+    <li class="flow-step" data-actor="code">
+      <span class="flow-num">05</span>
+      <span class="flow-tag">Rulebook</span>
+      <h3>Suggest next step</h3>
+      <p>Tests, what to inspect and what to ask for, each with a reason and its quotes.</p>
+    </li>
+    <li class="flow-step" data-actor="human">
+      <span class="flow-num">06</span>
+      <span class="flow-tag">Person</span>
+      <h3>Technician decides</h3>
+      <p>Accept or change, with a reason. There is no automatic close, scrap or return.</p>
+    </li>
+    <li class="flow-step" data-actor="code">
+      <span class="flow-num">LOG</span>
+      <span class="flow-tag">Record</span>
+      <h3>Feedback log</h3>
+      <p>The decision as JSONL, so acceptance and change reasons can be counted.</p>
+    </li>
+  </ol>
+
+  <div class="flow-trend">
+    <div class="flow-trend-head">
+      <span class="flow-num">07</span>
+      <span class="flow-tag">Code · separate path</span>
+      <h3>Trend watch</h3>
+    </div>
+    <p>Weekly complaint counts per make, model, model year and component group → Poisson spike alerts → a recall backtest. No model call, no text and no technician decision.</p>
+  </div>
+</section>
+
+<!-- ============================================================ QUEUE -->
+<section class="block wrap" id="queue" aria-labelledby="queue-title">
+  <div class="section-head">
+    <p class="eyebrow"><span>02</span> Triage queue</p>
+    <h2 id="queue-title">Twelve cards from the evaluation run.</h2>
+    <p class="section-intro">Each card is a technician's view of one complaint: the narrative with every extracted clue highlighted, the suggested test and why, the three nearest past cases, and the versions that produced it. The accept and change buttons are a demo; they store nothing.</p>
+    <p class="rule-note" id="queue-rule"></p>
+  </div>
+
+  <div class="queue-toolbar">
+    <div class="filter-group" id="queue-filters" role="group" aria-label="Filter cards by priority"></div>
+    <p class="toolbar-note">Highlighted words are the quotes the model returned; each one passed the verbatim check.</p>
+  </div>
+
+  <div class="queue-list" id="queue-list"></div>
+</section>
+
+<!-- ============================================================ RESULTS -->
+<section class="block wrap" id="results" aria-labelledby="results-title">
+  <div class="section-head">
+    <p class="eyebrow"><span>03</span> Results</p>
+    <h2 id="results-title">Two models, free baselines, one evaluation set.</h2>
+    <p class="section-intro">Every score below comes from the replay of the committed run, with 95% bootstrap intervals. Macro-F1 is the primary metric and counts an “unclear” answer as wrong. The baselines cost nothing and set the floor the models have to beat.</p>
+    <p class="run-meta" id="run-meta"></p>
+  </div>
+
+  <div class="glance-grid">
+    <section class="panel" aria-labelledby="glance-group-title">
+      <div class="panel-head">
+        <h3 id="glance-group-title">Component group</h3>
+        <span class="panel-unit">macro-F1 · higher is better</span>
+      </div>
+      <div class="bars" id="glance-group"></div>
+      <p class="panel-note">The TF-IDF baseline is a bag-of-words classifier on the past-case library. The models have to beat it by a wide margin to justify their cost.</p>
+    </section>
+    <section class="panel" aria-labelledby="glance-safety-title">
+      <div class="panel-head">
+        <h3 id="glance-safety-title">Safety decision</h3>
+        <span class="panel-unit">recall and precision · higher is better</span>
+      </div>
+      <div class="bars" id="glance-safety"></div>
+      <p class="panel-note">Recall is the share of coded crash, fire or injury cases the hard rules caught. Precision is the share of flagged cases that were coded. High recall with modest precision means many extra cases to read, not missed safety.</p>
+    </section>
+  </div>
+
+  <div class="panel table-panel">
+    <div class="panel-head">
+      <h3>Model scorecard</h3>
+      <span class="panel-unit">95% bootstrap CI in brackets</span>
+    </div>
+    <table class="metrics-table" id="models-table">
+      <caption class="sr-only">Model results on the evaluation set, with 95% confidence intervals.</caption>
+      <thead>
+        <tr>
+          <th scope="col">System</th>
+          <th scope="col">Macro-F1</th>
+          <th scope="col">Safety recall</th>
+          <th scope="col">Safety precision</th>
+          <th scope="col">Quote grounding</th>
+          <th scope="col">Needs human</th>
+          <th scope="col">Cost / 1,000</th>
+        </tr>
+      </thead>
+      <tbody id="models-table-body"></tbody>
+    </table>
+    <p class="panel-note" id="models-note"></p>
+  </div>
+
+  <div class="panel table-panel">
+    <div class="panel-head">
+      <h3>Baselines (cost $0)</h3>
+      <span class="panel-unit">the floor, not a competitor</span>
+    </div>
+    <table class="metrics-table baselines-table" id="baselines-table">
+      <caption class="sr-only">Free baselines on the same evaluation set.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Baseline</th>
+          <th scope="col">Metric</th>
+          <th scope="col">Detail</th>
+          <th scope="col">Note</th>
+        </tr>
+      </thead>
+      <tbody id="baselines-table-body"></tbody>
+    </table>
+  </div>
+
+  <div class="sources">
+    <div class="sources-head">
+      <h3>Where the two models came from</h3>
+      <p>The choice is not made on this page. <code>config/models.lock.toml</code> pins the pick, the card path and the card's commit.</p>
+    </div>
+    <div class="source-grid" id="source-cards"></div>
+  </div>
+</section>
+
+<!-- ============================================================ TREND -->
+<section class="block wrap" id="trend" aria-labelledby="trend-title">
+  <div class="section-head">
+    <p class="eyebrow"><span>04</span> Trend watch</p>
+    <h2 id="trend-title">A spike is a question, not a recall.</h2>
+    <p class="section-intro">Complaint counts are cheap and need no model. The rule flags a week with at least three complaints that also clears the Poisson 99.9% upper limit of its own trailing 26-week mean. The useful test is not how many alerts fire, but whether they beat random weeks of the same series.</p>
+  </div>
+
+  <figure class="trend-figure" aria-labelledby="chart-caption">
+    <figcaption id="chart-caption">
+      <span class="fig-label">One example series</span>
+      <span id="chart-title"></span>
+    </figcaption>
+    <div class="chart" id="trend-chart">
+      <div class="chart-y" id="chart-y" aria-hidden="true"></div>
+      <div class="chart-plot" id="chart-plot" role="img" aria-label="Weekly complaint counts for the example series, with the alert week and the recall marked.">
+        <div class="chart-grid" id="chart-grid" aria-hidden="true"></div>
+        <div class="chart-window" id="chart-window" aria-hidden="true"></div>
+        <div class="chart-bars" id="chart-bars" aria-hidden="true"></div>
+        <div class="chart-marker marker-alert" id="marker-alert" aria-hidden="true"></div>
+        <div class="chart-marker marker-recall" id="marker-recall" aria-hidden="true"></div>
+      </div>
+      <div class="chart-x" id="chart-x" aria-hidden="true"></div>
+    </div>
+    <div class="chart-legend">
+      <span><i class="swatch swatch-bar"></i>weekly complaints</span>
+      <span><i class="swatch swatch-alert"></i>alert week <span id="legend-alert"></span></span>
+      <span><i class="swatch swatch-recall"></i>recall <span id="legend-recall"></span></span>
+      <span><i class="swatch swatch-window"></i>365-day recall window</span>
+    </div>
+    <p class="fig-reading" id="example-reading"></p>
+  </figure>
+
+  <div class="trend-stats" id="trend-stats"></div>
+
+  <div class="reading" role="note">
+    <span class="reading-label">Honest reading</span>
+    <p id="trend-reading"></p>
+  </div>
+
+  <p class="method-note" id="trend-method"></p>
+</section>
+
+<!-- ============================================================ LIMITS -->
+<section class="block wrap" id="limits" aria-labelledby="limits-title">
+  <div class="section-head">
+    <p class="eyebrow"><span>05</span> Limits</p>
+    <h2 id="limits-title">What this page cannot tell you.</h2>
+    <p class="section-intro">Four limits matter more than any single score. They are part of the result, not a disclaimer bolted on at the end.</p>
+  </div>
+  <div class="limits-grid">
+    <article class="limit">
+      <span class="limit-num">01</span>
+      <h3>US vehicle complaints stand in for return reports</h3>
+      <p>A vehicle owner's complaint is not a lab return report. It is the same kind of free text, which is why it can stand in for the reading task — but the failure context, the test history and the customer's wording are different.</p>
+    </article>
+    <article class="limit">
+      <span class="limit-num">02</span>
+      <h3>The coded labels are noisy</h3>
+      <p>Crash, fire, injury and component fields come from a public coding process, not from an engineer's finding. Safety and group scores inherit that noise, and no amount of model quality removes it.</p>
+    </article>
+    <article class="limit">
+      <span class="limit-num">03</span>
+      <h3>The rulebook is an example</h3>
+      <p>Seven condition and symptom kinds map to suggested tests. A lab would replace them with its own test catalogue, inspection points and escalation rules; the hard rules around safety stay as they are.</p>
+    </article>
+    <article class="limit">
+      <span class="limit-num">04</span>
+      <h3>Condition agreement is not accuracy</h3>
+      <p>There is no ground truth for “moisture” or “vibration”. The condition number is agreement with a fixed keyword rule, and it is labelled that way everywhere it appears.</p>
+    </article>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <p class="footer-statement">No result on this page closes, scraps or returns a part.</p>
+    <div class="footer-grid">
+      <p>Built from the committed files under <code>results/</code> by <code>make page</code>. The page is one static HTML file and works offline.</p>
+      <p>Data: public NHTSA ODI complaints and recalls, 2020–2026 snapshot, with personal details screened out. Text is shown as received.</p>
+      <p class="footer-links">
+        <a href="https://github.com/sabers13/field-return-triage">Source on GitHub</a>
+        <span aria-hidden="true">·</span>
+        <span>MIT licence</span>
+        <span aria-hidden="true">·</span>
+        <span>Saber Sojudi</span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- build:data -->
+<!-- build:script -->
+</body>
+</html>
