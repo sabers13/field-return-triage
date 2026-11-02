@@ -1,0 +1,47 @@
+# Canonical project facts.
+#
+# Every number the README quotes, and every number on the page, is copied from here.
+# Each entry names the committed file it comes from and the exact text that file
+# contains; `scripts/check_facts.py` (`make facts`) re-checks both. A number cannot
+# drift away from its source without the release gate failing.
+
+title: "Field Return Triage"
+slug: field-return-triage
+repo: https://github.com/sabers13/field-return-triage
+live_url: https://sabersojudi.com/field-return-triage/
+stack: [Python, pydantic, sentence-transformers, pytest, Ruff, mypy]
+stack_label: "Python, pydantic, sentence-transformers, pytest"
+one_line: "a complaint-to-triage-card pipeline that reads returned-part complaints, quotes the failure clues and suggests the next test"
+mention: "a field-return complaint triage pipeline"
+summary: "A pipeline that reads a returned-part complaint, pulls out the failure clues with the exact words they came from, flags safety cases first, finds similar past cases and suggests the next test. A technician decides every case. The model only extracts; deterministic hard rules and a rulebook make the routing and test suggestions, and every published number is replayed offline from committed recordings."
+tags: [python, llm, nlp, data_engineering, testing, ci]
+keywords: "field return triage, complaint analysis, failure analysis, no trouble found, LLM extraction, quote grounding, safety triage, nearest-neighbour retrieval, trend detection, reproducible replay"
+claim_limits: "Independent portfolio project. The complaint text is public NHTSA vehicle owner data used as a stand-in for a lab's own return reports, not real return data. The evaluation set is safety-oversampled and the comparison model is scored on fewer items after a budget cut. Safety precision is low by design: the hard rules send a case to a person rather than risk a miss. Every result is replayed from committed recordings with no key and no network, and nothing here is a production deployment."
+
+# Three CV bullets: outcome, technical, stack. Every number in a bullet's text is
+# declared with the file that proves it and the text that file contains.
+bullets:
+  - kind: outcome
+    text: "Turns each returned-part complaint into a triage card: the primary model reached **0.863** macro-F1 over **8** component groups, the hard rules reached **1.000** safety recall at **0.359** precision, and **0.823** of the five nearest past cases shared the query's group."
+    numbers:
+      - { value: "0.863", file: "results/SUMMARY.md", contains: "0.863 (0.825-0.895)" }
+      - { value: "8", file: "data/groups.toml", contains: "8 groups" }
+      - { value: "1.000", file: "results/SUMMARY.md", contains: "1.000 (0.954-1.000)" }
+      - { value: "0.359", file: "results/SUMMARY.md", contains: "0.359 (0.299-0.424)" }
+      - { value: "0.823", file: "results/SUMMARY.md", contains: "0.823 (0.805-0.839)" }
+  - kind: technical
+    text: "Ran the **400**-item evaluation on two locked models for **USD 1.32254292**, cut the comparison model to **200** items under the **USD 3** cap, then rebuilt every number offline from committed recordings in replay with no key and no network."
+    numbers:
+      - { value: "400", file: "results/runs/live/manifest.json", contains: "item_count" }
+      - { value: "1.32254292", file: "results/runs/live/manifest.json", contains: "1.32254292" }
+      - { value: "200", file: "results/runs/live/metrics.json", contains: "items_run" }
+      - { value: "3", file: "config/budget.toml", contains: "hard_cap_usd = 3.0" }
+  - kind: stack
+    text: "Python **3.12** with pydantic contracts, a record/replay model client, sentence-transformers embeddings on CPU, and a pytest suite that blocks sockets."
+    numbers:
+      - { value: "3.12", file: "pyproject.toml", contains: "requires-python" }
+
+resources: # only what this project used FROM someone else
+  - { name: "NHTSA ODI vehicle owner complaints", owner: "U.S. Department of Transportation, NHTSA", licence: "U.S. government work, public domain", url: "https://static.nhtsa.gov/odi/ffdd/cmpl/", used_as: "complaint narratives, coded component labels and crash/fire/injury flags for the library and evaluation set" }
+  - { name: "NHTSA ODI Part 573 safety recalls", owner: "U.S. Department of Transportation, NHTSA", licence: "U.S. government work, public domain", url: "https://static.nhtsa.gov/odi/ffdd/rcl/", used_as: "recall report dates for the trend-watch backtest" }
+  - { name: "BAAI/bge-small-en-v1.5", owner: "BAAI", licence: "MIT", url: "https://huggingface.co/BAAI/bge-small-en-v1.5", used_as: "CPU embeddings for the similar-past-case index" }

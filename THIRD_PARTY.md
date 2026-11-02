@@ -62,7 +62,29 @@ extracts may be redistributed. The privacy sentence is the reason for the hard r
 data contributed by the public, so identity and location columns are dropped and a
 narrative that matches the PII screen is discarded, never committed.
 
-## What this project commits from them
+## Embedding model
+
+The similar-case search uses one third-party model. It is downloaded once by
+`make index`, cached outside git, and pinned to an exact revision so a replay cannot
+silently change its vectors.
+
+| | |
+|---|---|
+| Model | `BAAI/bge-small-en-v1.5` |
+| Publisher | Beijing Academy of Artificial Intelligence (BAAI) |
+| Source | <https://huggingface.co/BAAI/bge-small-en-v1.5> |
+| Revision | `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a` |
+| Licence | MIT |
+| Used as | CPU embeddings for the similar-past-case index and for precision@5 |
+
+## This project's own code
+
+Everything under `src/`, `scripts/`, `tests/`, `config/`, `docs/` and the results and
+reports written by those programs is this project's own work and is MIT licensed (see
+`LICENSE`). The model-selection card read from the sibling project is that project's own
+output; only its model ids and source commit are referenced here.
+
+## What this project commits from the datasets
 
 - `data/library.jsonl.gz` — 20,000 past cases from complaints received 2020-2024.
 - `data/eval.jsonl` — 400 evaluation complaints received 2025-2026, `frt` half.
