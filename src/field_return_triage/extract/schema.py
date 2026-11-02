@@ -47,12 +47,20 @@ class MileageAnswer(_Answer):
 
 
 class ExtractionAnswer(_Answer):
-    """One complaint's structured reading; every key is part of the prompt."""
+    """One complaint's structured reading; every key is part of the prompt.
 
-    component_group: str = Field(default="unclear", min_length=1)
-    safety_relevant: bool = False
-    safety_quote: str | None = None
-    symptoms: list[SymptomAnswer] = Field(default_factory=list)
-    conditions: list[ConditionAnswer] = Field(default_factory=list)
-    fault_codes: list[FaultCodeAnswer] = Field(default_factory=list)
-    mileage: MileageAnswer | None = None
+    Every field is required on purpose. The prompt says the answer must have exactly
+    these keys, and the endpoint's JSON-schema mode can only enforce that when the
+    schema marks them required. With defaults the schema said "optional", the live
+    models left keys out, and an omitted ``safety_quote`` made a true safety flag
+    invalid (R7 smoke, 2026-11-01). A missing key is now a visible invalid answer
+    instead of a silent default.
+    """
+
+    component_group: str = Field(min_length=1)
+    safety_relevant: bool
+    safety_quote: str | None
+    symptoms: list[SymptomAnswer]
+    conditions: list[ConditionAnswer]
+    fault_codes: list[FaultCodeAnswer]
+    mileage: MileageAnswer | None
