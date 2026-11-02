@@ -1,117 +1,64 @@
-/* Field Return Triage — renders the committed page data. No dependencies, no network.
-   Every value below is read from #page-data, which `make page-data` writes from
-   results/. Nothing is fetched, and the demo buttons keep their state in memory only. */
-
+/* All evidence comes from the committed results embedded by make page.
+   No requests or model calls. Review decisions live in memory only. */
 (() => {
   "use strict";
-
-  const DATA = JSON.parse(document.getElementById("page-data").textContent);
   const $ = (selector, root = document) => root.querySelector(selector);
-
-  const esc = (value) =>
-    String(value ?? "").replace(/[&<>"']/g, (character) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    })[character]);
-
-  const fmt = {
-    dec(value, digits = 3) {
-      return value === null || value === undefined ? "—" : Number(value).toFixed(digits);
-    },
-    pct(value, digits = 1) {
-      return value === null || value === undefined ? "—" : `${(Number(value) * 100).toFixed(digits)}%`;
-    },
-    money(value) {
-      return value === null || value === undefined ? "—" : `$${Number(value).toFixed(4)}`;
-    },
-    int(value) {
-      return value === null || value === undefined ? "—" : Number(value).toLocaleString("en-US");
-    },
-  };
-
-  const PRIORITY = {
-    1: { label: "Priority 1", sub: "Safety first" },
-    2: { label: "Priority 2", sub: "Clear clues" },
-    3: { label: "Priority 3", sub: "Needs human reading" },
-  };
-
-  const FIELD_LABEL = {
-    safety: "Safety clue",
-    symptoms: "Symptom",
-    conditions: "Condition",
-    fault_codes: "Fault code",
-    mileage: "Mileage",
-  };
-
-  /* ---------------------------------------------------------- theme */
-
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const root = document.documentElement;
-  const themeButton = $("#theme-toggle");
-  let explicitTheme = false;
-
+  const scheme = matchMedia("(prefers-color-scheme: dark)");
+  let manualTheme = new URLSearchParams(location.search).has("theme");
+  try { manualTheme ||= ["light", "dark"].includes(localStorage.getItem("frt-theme")); } catch (_) {}
   function applyTheme(theme) {
     root.dataset.theme = theme;
-    themeButton.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
-    themeButton.setAttribute(
-      "aria-label",
-      theme === "dark" ? "Switch to light appearance" : "Switch to dark appearance",
-    );
+    $$('[data-theme-set]').forEach(button => button.setAttribute("aria-pressed", String(button.dataset.themeSet === theme)));
+    $('meta[name="theme-color"]').content = theme === "dark" ? "#030712" : "#f9fafb";
   }
+  applyTheme(root.dataset.theme);
+  $$('[data-theme-set]').forEach(button => button.addEventListener("click", () => {
+    manualTheme = true;
+    const url = new URL(location.href);
+    if (url.searchParams.has("theme")) { url.searchParams.delete("theme"); history.replaceState(null, "", url); }
+    applyTheme(button.dataset.themeSet);
+    try { localStorage.setItem("frt-theme", button.dataset.themeSet); } catch (_) {}
+  }));
+  scheme.addEventListener("change", event => { if (!manualTheme) applyTheme(event.matches ? "dark" : "light"); });
 
-  try {
-    const stored = localStorage.getItem("frt-theme");
-    if (stored === "light" || stored === "dark") {
-      explicitTheme = true;
-      applyTheme(stored);
-    }
-  } catch (error) {
-    /* file:// or a privacy mode can refuse storage; the page still works. */
-  }
-
-  const scheme = window.matchMedia("(prefers-color-scheme: dark)");
-  if (!explicitTheme) applyTheme(scheme.matches ? "dark" : "light");
-
-  themeButton.addEventListener("click", () => {
-    const next = root.dataset.theme === "dark" ? "light" : "dark";
-    explicitTheme = true;
-    applyTheme(next);
-    try {
-      localStorage.setItem("frt-theme", next);
-    } catch (error) {
-      /* no storage, no problem */
-    }
-  });
-
-  if (typeof scheme.addEventListener === "function") {
-    scheme.addEventListener("change", (event) => {
-      if (!explicitTheme) applyTheme(event.matches ? "dark" : "light");
+  const navLinks = $$('.nav a, .rail-nav a');
+  const sections = ["overview", "queue", "results", "method"].map(id => document.getElementById(id));
+  let navTicking = false;
+  function updateNavigation() {
+    const top = root.clientWidth <= 600 ? 150 : 120;
+    let current = sections[0];
+    for (const section of sections) if (section.getBoundingClientRect().top <= top) current = section;
+    navLinks.forEach(link => {
+      if (link.hash === `#${current.id}`) link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
     });
+    navTicking = false;
   }
+  addEventListener("scroll", () => { if (!navTicking) { requestAnimationFrame(updateNavigation); navTicking = true; } }, { passive: true });
+  addEventListener("resize", updateNavigation);
+  updateNavigation();
 
-  /* ---------------------------------------------------------- hero */
-
-  const baselineCount = ["group", "safety", "conditions"].filter(
-    (key) => DATA.results.baselines[key] && DATA.results.baselines[key].available,
-  ).length;
-
-  const heroStats = [
-    [fmt.int(DATA.run.item_count), "complaints evaluated"],
-    [String(DATA.results.models.length), "extraction models"],
-    [String(baselineCount), "free baselines"],
-    [fmt.int(DATA.trend.backtest.alerts.total), "spike alerts backtested"],
-  ];
-
-  $("#hero-stats").innerHTML = heroStats
-    .map(
-      ([value, label]) =>
-        `<div class="hero-stat"><dt>${esc(value)}</dt><dd>${esc(label)}</dd></div>`,
-    )
-    .join("");
-
-  /* ---------------------------------------------------------- queue */
+  let DATA;
+  try {
+    DATA = JSON.parse($("#page-data").textContent);
+    if (!DATA.queue.cards.length || !DATA.results.models.length || !DATA.trend.example.weeks.length) throw new Error("Missing evidence");
+  } catch (_) { $("#data-error").hidden = false; return; }
+  const esc = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+  const fmt = {
+    dec: (value, digits = 3) => value == null ? "—" : Number(value).toFixed(digits),
+    pct: (value, digits = 1) => value == null ? "—" : `${(Number(value) * 100).toFixed(digits)}%`,
+    money: value => value == null ? "—" : `$${Number(value).toFixed(4)}`,
+    int: value => value == null ? "—" : Number(value).toLocaleString("en-US"),
+  };
+  const FIELD_LABEL = { safety: "Safety clue", symptoms: "Symptom", conditions: "Condition", fault_codes: "Fault code", mileage: "Mileage" };
+  const PRIORITY = { 1: "Safety first", 2: "Clear clues", 3: "Needs human reading" };
+  const groupName = group => ({ power_windows_locks_switches: "Windows, locks and switches", airbags: "Airbags", electrical_system: "Electrical system", lighting: "Lighting", electronic_stability_control: "Stability control", steering: "Steering", brakes: "Brakes", power_train: "Powertrain", unclear: "Component unclear" })[group] || group.replaceAll("_", " ");
+  const vehicleName = card => [card.vehicle.model_year, card.vehicle.make, card.vehicle.model].filter(Boolean).join(" ");
+  const date = value => new Intl.DateTimeFormat("en", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+  const icon = id => `<svg aria-hidden="true"><use href="#i-${id}"/></svg>`;
+  const ci = (metric, format = fmt.dec) => `${format(metric?.value)} <span class="ci">95% CI ${format(metric?.ci_low)}–${format(metric?.ci_high)}</span>`;
 
   function escapeRegExp(text) {
     return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -214,494 +161,158 @@
       .join("")}</p>`;
   }
 
-  function priorityPill(card) {
-    const priority = PRIORITY[card.priority] || { label: "Priority", sub: "" };
-    return `<span class="priority-pill">${esc(priority.label)} <span>${esc(priority.sub)}</span></span>`;
-  }
 
-  function priorityPillText(card) {
-    const priority = PRIORITY[card.priority] || { label: "Priority", sub: "" };
-    return `${priority.label}, ${priority.sub}`;
-  }
-
-  function cardMeta(card) {
-    const vehicle = [card.vehicle.make, card.vehicle.model, card.vehicle.model_year]
-      .filter(Boolean)
-      .join(" ");
-    const pieces = [];
-    if (vehicle) pieces.push(`<span>${esc(vehicle)}</span>`);
-    if (card.received) pieces.push(`<span>received ${esc(card.received)}</span>`);
-    return pieces.join("");
-  }
-
-  function neighboursBlock(card) {
-    const items = card.neighbours
-      .map((neighbour) => {
-        const sameGroup = neighbour.group === card.group;
-        const groupNote = sameGroup
-          ? '<span class="same-group">same group</span>'
-          : '<span class="other-group">different group</span>';
-        const safety = neighbour.safety_relevant
-          ? '<span><span class="safety-dot"></span>safety-relevant</span>'
-          : "";
-        return `<article class="neighbour">
-          <div class="neighbour-top">
-            <span class="neighbour-id">#${esc(neighbour.complaint_id)}</span>
-            <span class="neighbour-score">${fmt.dec(neighbour.score, 4)}</span>
-          </div>
-          <div class="neighbour-meta">
-            <span>${esc(String(neighbour.group).replace(/_/g, " "))}</span>
-            ${groupNote}
-            <span>${esc(neighbour.received)}</span>
-            ${safety}
-          </div>
-          <p class="neighbour-excerpt">${esc(neighbour.excerpt)}</p>
-        </article>`;
-      })
-      .join("");
-    return `<section class="neighbours" aria-label="Nearest past cases">
-      <div class="neighbours-head">
-        <h3>${card.neighbours.length} nearest past cases</h3>
-        <p>Cosine similarity, four decimals; ties break by complaint id.</p>
-      </div>
-      <div class="nearest-grid">${items}</div>
-    </section>`;
-  }
+  const cards = DATA.queue.cards;
+  const example = cards.find(card => card.priority === 2) || cards[0];
+  const condition = example.clues.find(clue => clue.field === "conditions");
+  const symptom = example.clues.find(clue => clue.field === "symptoms");
+  $("#hero-example").innerHTML = `<div class="quote-preview"><p class="block-label">In complaint #${esc(example.complaint_id)}</p><blockquote>“${esc(symptom?.text || example.narrative)}”<br>in <mark>${esc(condition?.text || "the reported conditions")}</mark></blockquote><p class="quote-context">${esc(vehicleName(example))}</p></div>
+    <div class="preview-connection">${icon("check")}<span>Exact words checked against the original</span></div>
+    <div class="suggestion-preview"><p class="block-label">Suggested test</p><p>${esc(example.suggestion.tests[0] || "Ask for more information")}</p></div>`;
+  $("#queue-rule").textContent = `${DATA.queue.rule} Cards come from ${DATA.queue.model_id}. The opening example is the first clear-clue case in that fixed selection, with every selected case available below.`;
 
   function reasonsList(reasons) {
-    if (!reasons.length) return "";
-    return `<ul class="reasons">${reasons
-      .map((reason) => {
-        const quotes = reason.quotes.length
-          ? `<p class="reason-quotes">${reason.quotes
-              .map((quote) => `“${esc(quote)}”`)
-              .join(" · ")}</p>`
-          : "";
-        return `<li><p class="reason-text">${esc(reason.text).replace(/_/g, " ")}</p>${quotes}</li>`;
-      })
-      .join("")}</ul>`;
+    return reasons.length ? `<ul class="reasons">${reasons.map(reason => `<li><p>${esc(reason.text.replaceAll("_", " "))}</p>${reason.quotes.length ? `<p class="reason-quotes">${reason.quotes.map(quote => `“${esc(quote)}”`).join(" · ")}</p>` : ""}</li>`).join("")}</ul>` : "<p>No specific reason was recorded.</p>";
   }
-
-  function demoBlock(card) {
-    return `<div class="demo" data-card-id="${esc(card.card_id)}" data-state="idle" data-priority="${esc(card.priority)}">
-      <button class="btn btn-primary" type="button" data-demo="accept">Accept</button>
-      <button class="btn" type="button" data-demo="change">Change…</button>
-      <span class="demo-note">Demo only · stores nothing</span>
-    </div>`;
+  function neighboursBlock(card) {
+    return `<div class="nearest-grid">${card.neighbours.map(neighbour => `<article class="neighbour"><div class="neighbour-top"><strong>#${esc(neighbour.complaint_id)}</strong><span>Similarity ${fmt.dec(neighbour.score, 4)}</span></div><p class="neighbour-meta"><span>${esc(groupName(neighbour.group))}</span><span class="${neighbour.group === card.group ? "same-group" : "other-group"}">${neighbour.group === card.group ? "Same component group" : "Different component group"}</span><span>${esc(date(neighbour.received))}</span>${neighbour.safety_relevant ? "<span>Safety-relevant</span>" : ""}</p><p class="neighbour-excerpt">${esc(neighbour.excerpt)}…</p></article>`).join("")}</div>`;
   }
-
   function cardHTML(card) {
-    const chips = [
-      `<span class="chip">${esc(String(card.group).replace(/_/g, " "))}</span>`,
-      card.needs_human_review && card.priority !== 3
-        ? '<span class="chip chip-human">needs human reading</span>'
-        : "",
-      card.coded_safety
-        ? `<span class="chip chip-safety">coded ${esc(card.coded_flags.join(" / "))}</span>`
-        : "",
-    ].join("");
-
-    const suggestion = card.suggestion;
-    const testChips = suggestion.tests.length
-      ? `<div class="test-chips">${suggestion.tests
-          .map((test) => `<span class="test-chip">${esc(test)}</span>`)
-          .join("")}</div>`
-      : "";
-
-    const inspect = suggestion.inspect.length
-      ? `<div class="test-block"><p class="block-label">Inspect</p><p class="reason-text">${suggestion.inspect
-          .map(esc)
-          .join("; ")}</p></div>`
-      : "";
-
-    const request = suggestion.request.length
-      ? `<div class="test-block"><p class="block-label">Ask for</p><ul class="ask-list">${suggestion.request
-          .map((item) => `<li>${esc(item)}</li>`)
-          .join("")}</ul></div>`
-      : "";
-
-    const routing = card.reasons.length
-      ? `<div class="routing"><p class="block-label">Card routing</p>${reasonsList(card.reasons)}</div>`
-      : "";
-
-    const noClues = card.clues.length
-      ? ""
-      : `<p class="no-clues"><strong>No highlighted clues.</strong> ${
-          card.needs_human_review
-            ? "No quote passed the verbatim check, so the hard rules send this card to human reading."
-            : "No quote passed the verbatim check, so the rulebook falls back to the standard test."
-        }</p>`;
-
-    const versions = card.versions;
-    return `<article class="card" data-priority="${esc(card.priority)}" aria-label="Complaint ${esc(
-      card.complaint_id,
-    )}, ${esc(priorityPillText(card))}">
-      <header class="card-head">
-        ${priorityPill(card)}
-        <span class="card-id">#${esc(card.complaint_id)}</span>
-        ${chips}
-        <div class="card-meta">${cardMeta(card)}</div>
-      </header>
-      <div class="card-body">
-        <div class="card-col">
-          <p class="col-label">Complaint narrative <span class="quiet">${
-            card.clues.length
-          } highlighted ${card.clues.length === 1 ? "clue" : "clues"}</span></p>
-          <p class="narrative">${highlight(card.narrative, card.clues)}</p>
-          ${clueLegend(card.clues)}
-          ${noClues}
-          ${routing}
-        </div>
-        <div class="card-col">
-          <p class="col-label">Suggested next step <span class="quiet">rulebook</span></p>
-          <div class="test-block"><p class="block-label">Test</p>${testChips}</div>
-          ${inspect}
-          <div class="test-block"><p class="block-label">Why this test</p>${reasonsList(
-            suggestion.reasons,
-          )}</div>
-          ${request}
-        </div>
-      </div>
-      ${neighboursBlock(card)}
-      <footer class="card-foot">
-        <p class="versions" aria-label="Versions">
-          <span>model ${esc(versions.model)}</span>
-          <span>prompt ${esc(versions.prompt)}</span>
-          <span>rulebook ${esc(versions.rulebook)}</span>
-          <span>hard rules ${esc(versions.hard_rules)}</span>
-          <span>schema ${esc(versions.schema)}</span>
-          <span>quotes ${esc(card.quote_check.passed)}/${esc(card.quote_check.checked)} passed</span>
-        </p>
-        ${demoBlock(card)}
-      </footer>
+    const s = card.suggestion;
+    return `<article class="card" id="case-${esc(card.complaint_id)}" data-priority="${card.priority}" aria-label="Complaint ${esc(card.complaint_id)}" hidden>
+      <header class="card-head"><span class="priority-pill" data-priority="${card.priority}">Priority ${card.priority} · ${PRIORITY[card.priority]}</span><span class="card-id">#${esc(card.complaint_id)} · ${esc(date(card.received))}</span><h3 class="card-vehicle">${esc(vehicleName(card))}</h3><span class="chip">${esc(groupName(card.group))}</span>${card.coded_safety ? `<span class="chip">Coded ${esc(card.coded_flags.join(" / "))}</span>` : ""}</header>
+      <div class="card-body"><div class="card-col"><h4 class="col-label">Original complaint</h4><p class="narrative">${highlight(card.narrative, card.clues)}</p>${clueLegend(card.clues)}${!card.clues.length ? '<p class="no-clues">No clue passed the quote check. A person needs to read this complaint.</p>' : ""}<p class="routing-note">${card.priority === 1 ? "Safety takes priority. A person must review this case." : card.priority === 3 ? "The evidence is unclear. This case needs human reading." : "Clear clues survived the quote check. A technician still makes the decision."}</p></div>
+      <div class="card-col"><h4 class="col-label">Suggested next step</h4><ul class="test-list">${s.tests.map(test => `<li>${esc(test)}</li>`).join("") || "<li>Standard test; ask for more information</li>"}</ul><div class="test-block"><p class="block-label">Why this test</p>${reasonsList(s.reasons)}</div>${s.inspect.length ? `<div class="test-block"><p class="block-label">Inspect</p><p>${s.inspect.map(esc).join("; ")}</p></div>` : ""}${s.request.length ? `<div class="test-block"><p class="block-label">Ask the customer for</p><ul class="ask-list">${s.request.map(item => `<li>${esc(item)}</li>`).join("")}</ul></div>` : ""}</div></div>
+      <div class="record-details"><details><summary>The nearest past cases</summary><div class="technical-body"><p class="detail-intro">The pipeline searches for five cases; this preview shows the nearest three. Similarity measures text closeness, not the likelihood of the same fault. A different component group is labelled explicitly.</p>${neighboursBlock(card)}</div></details><details><summary>Routing, quote checks and versions</summary><div class="technical-body">${reasonsList(card.reasons)}<dl class="versions">${Object.entries(card.versions).map(([key,value]) => `<div><dt>${esc(key.replaceAll("_", " "))}</dt><dd>${esc(value)}</dd></div>`).join("")}<div><dt>Quote check</dt><dd>${card.quote_check.passed} / ${card.quote_check.checked} passed; ${card.quote_check.dropped} dropped</dd></div></dl></div></details></div>
+      <footer class="card-foot"><div class="demo" data-card-id="${esc(card.card_id)}" data-priority="${card.priority}" role="group" aria-label="Demo review for complaint ${esc(card.complaint_id)}"><div class="demo-actions"><button class="btn btn-primary" type="button" data-demo="accept">Accept suggestion</button><button class="btn" type="button" data-demo="change">Change with a reason</button><span class="demo-note">Demo only · nothing saved</span></div></div></footer>
     </article>`;
   }
-
-  $("#queue-rule").innerHTML = `<strong>Selection rule.</strong> ${esc(DATA.queue.rule)} Cards from <code>${esc(
-    DATA.queue.model_id,
-  )}</code>.`;
-
-  const counts = DATA.queue.counts;
-  const filterOptions = [
-    ["all", `All ${DATA.queue.cards.length}`],
-    ["1", `${PRIORITY[1].label} ${counts["1"] || 0}`],
-    ["2", `${PRIORITY[2].label} ${counts["2"] || 0}`],
-    ["3", `${PRIORITY[3].label} ${counts["3"] || 0}`],
-  ];
-
-  $("#queue-filters").innerHTML = filterOptions
-    .map(
-      ([value, label], index) =>
-        `<button class="filter" type="button" data-filter="${value}" aria-pressed="${
-          index === 0 ? "true" : "false"
-        }">${esc(label.replace(/ \d+$/, ""))} <span class="count">${esc(
-          label.match(/\d+$/)?.[0] || "",
-        )}</span></button>`,
-    )
-    .join("");
-
-  $("#queue-list").innerHTML = DATA.queue.cards.map(cardHTML).join("");
-
-  const cards = Array.from(document.querySelectorAll("#queue-list .card"));
-  $("#queue-filters").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-filter]");
-    if (!button) return;
-    const value = button.dataset.filter;
-    for (const other of document.querySelectorAll("#queue-filters .filter")) {
-      other.setAttribute("aria-pressed", other === button ? "true" : "false");
+  $("#example-browser").innerHTML = `<div class="queue-toolbar"><div class="filter-group" role="group" aria-label="Filter examples by priority">${[["all","All cases"],["1","Safety"],["2","Clear clues"],["3","Human reading"]].map(([value,label]) => `<button type="button" data-filter="${value}" aria-pressed="${value === "all"}">${label}</button>`).join("")}</div><span class="queue-count" id="queue-count" role="status"></span></div><label class="case-mobile" for="case-select">Choose a recorded complaint<select name="recorded-case" id="case-select"></select></label><div class="queue-workspace"><div class="case-list" role="group" aria-label="Recorded complaints">${cards.map(card => `<button class="case-choice" data-case="${esc(card.complaint_id)}" type="button" aria-pressed="false" aria-controls="case-${esc(card.complaint_id)}"><strong>#${esc(card.complaint_id)} · ${PRIORITY[card.priority]}</strong><small>${esc(vehicleName(card))}</small><span class="case-group">${esc(groupName(card.group))}</span></button>`).join("")}</div><div class="case-panels">${cards.map(cardHTML).join("")}</div></div>`;
+  let filter = "all";
+  let selected = example.complaint_id;
+  function selectionFromURL() {
+    const query = new URLSearchParams(location.search);
+    filter = ["1", "2", "3"].includes(query.get("priority")) ? query.get("priority") : "all";
+    const available = cards.filter(card => filter === "all" || String(card.priority) === filter);
+    selected = available.find(card => card.complaint_id === query.get("case"))?.complaint_id || (filter === "all" ? example.complaint_id : available[0].complaint_id);
+  }
+  function renderSelection(writeURL = false) {
+    const available = cards.filter(card => filter === "all" || String(card.priority) === filter);
+    $$("[data-filter]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.filter === filter)));
+    $$(".case-choice").forEach(button => {
+      button.hidden = !available.some(card => card.complaint_id === button.dataset.case);
+      button.setAttribute("aria-pressed", String(button.dataset.case === selected));
+    });
+    $$(".card").forEach(card => { card.hidden = card.id !== `case-${selected}`; });
+    $("#case-select").innerHTML = available.map(card => `<option value="${esc(card.complaint_id)}"${card.complaint_id === selected ? " selected" : ""}>#${esc(card.complaint_id)} — ${esc(vehicleName(card))} — ${PRIORITY[card.priority]}</option>`).join("");
+    $("#queue-count").textContent = `${available.length} recorded cases · showing #${selected}`;
+    if (writeURL) {
+      const url = new URL(location.href);
+      url.searchParams.set("case", selected);
+      if (filter === "all") url.searchParams.delete("priority"); else url.searchParams.set("priority", filter);
+      history.pushState(null, "", url);
     }
-    for (const card of cards) {
-      card.hidden = value !== "all" && card.dataset.priority !== value;
+  }
+  selectionFromURL(); renderSelection();
+  $("#example-browser").addEventListener("click", event => {
+    const choice = event.target.closest("[data-case]");
+    const priority = event.target.closest("[data-filter]");
+    if (choice) { selected = choice.dataset.case; renderSelection(true); }
+    if (priority) {
+      filter = priority.dataset.filter;
+      const available = cards.filter(card => filter === "all" || String(card.priority) === filter);
+      if (!available.some(card => card.complaint_id === selected)) selected = available[0].complaint_id;
+      renderSelection(true);
     }
   });
+  $("#case-select").addEventListener("change", event => { selected = event.target.value; renderSelection(true); });
+  addEventListener("popstate", () => { selectionFromURL(); renderSelection(); });
 
-  /* ---------------------------------------------------------- demo decisions */
-
-  const demoDefaults = new Map();
-  for (const demo of document.querySelectorAll(".demo")) {
-    demoDefaults.set(demo.dataset.cardId, demo.innerHTML);
+  // Review is a local demonstration. Only the appearance preference uses storage.
+  const initialDemos = new Map($$(".demo").map(demo => [demo.dataset.cardId, demo.innerHTML]));
+  function resetDemo(demo) { demo.innerHTML = initialDemos.get(demo.dataset.cardId); $("button", demo).focus(); }
+  function showDecision(demo, text) {
+    demo.innerHTML = `<p class="demo-status" role="status"></p><div class="demo-actions"><button type="button" class="btn" data-demo="reset">Reset demo</button><span class="demo-note">Nothing was saved or sent.</span></div>`;
+    $(".demo-status", demo).textContent = text;
+    $("button", demo).focus();
   }
-
-  function finishDemo(demo, message) {
-    demo.dataset.state = "done";
-    demo.innerHTML = `<span class="demo-status">${esc(message)}</span>
-      <button class="btn btn-quiet" type="button" data-demo="reset">Reset</button>`;
-  }
-
-  function resetDemo(demo) {
-    demo.dataset.state = "idle";
-    demo.innerHTML = demoDefaults.get(demo.dataset.cardId) || "";
-  }
-
-  $("#queue-list").addEventListener("click", (event) => {
+  $("#example-browser").addEventListener("click", event => {
     const button = event.target.closest("[data-demo]");
     if (!button) return;
     const demo = button.closest(".demo");
-    if (!demo) return;
-
-    if (button.dataset.demo === "accept") {
-      finishDemo(demo, "Accepted in this demo — nothing was stored.");
-    } else if (button.dataset.demo === "reset") {
-      resetDemo(demo);
-    } else if (button.dataset.demo === "cancel") {
-      resetDemo(demo);
-    } else if (button.dataset.demo === "change") {
-      const selectId = `reason-${demo.dataset.cardId.replace(/[^a-z0-9]+/gi, "-")}`;
-      demo.innerHTML = `<form class="change-form">
-        <label for="${esc(selectId)}">Reason (not stored)</label>
-        <select id="${esc(selectId)}" name="reason">
-          <option>Different test is needed</option>
-          <option>Wrong component group</option>
-          <option>More information is needed</option>
-          <option>Other</option>
-        </select>
-        <button class="btn btn-primary" type="submit">Note change</button>
-        <button class="btn btn-quiet" type="button" data-demo="cancel">Cancel</button>
-      </form>`;
+    if (button.dataset.demo === "accept") showDecision(demo, "Suggestion accepted in this demonstration. A real technician would still decide the case.");
+    if (button.dataset.demo === "reset" || button.dataset.demo === "cancel") resetDemo(demo);
+    if (button.dataset.demo === "change") {
+      const reasonID = `reason-${demo.closest(".card").id}`;
+      demo.innerHTML = `<form class="change-form"><label for="${reasonID}">Why would you change this suggestion?<textarea id="${reasonID}" name="review-reason" required maxlength="2000" autocomplete="off" placeholder="For example, run the voltage check before temperature cycling…"></textarea></label><p class="demo-note">The original safety priority stays in place. No decision is saved.</p><div class="demo-actions"><button class="btn btn-primary" type="submit">Apply demo change</button><button class="btn" type="button" data-demo="cancel">Cancel</button></div></form>`;
+      $("textarea", demo).focus();
     }
   });
-
-  $("#queue-list").addEventListener("submit", (event) => {
+  $("#example-browser").addEventListener("submit", event => {
     if (!event.target.matches(".change-form")) return;
     event.preventDefault();
-    const demo = event.target.closest(".demo");
-    if (!demo) return;
-    finishDemo(demo, "Change noted in this demo — nothing was stored.");
+    const textarea = $("textarea", event.target);
+    const reason = textarea.value.trim();
+    if (!reason) { textarea.setCustomValidity("Enter a reason to try the change."); textarea.reportValidity(); return; }
+    showDecision(event.target.closest(".demo"), `Demo change applied. Reason: ${reason}. The original priority is unchanged.`);
   });
-
-  /* ---------------------------------------------------------- results */
-
-  function withCI(metric, formatter) {
-    if (!metric || metric.value === null || metric.value === undefined) {
-      return '<span class="value muted-value">—</span>';
-    }
-    const main = `<span class="value">${esc(formatter(metric.value))}</span>`;
-    if (metric.ci_low === null || metric.ci_high === null) return main;
-    return `${main}<span class="ci">${esc(formatter(metric.ci_low))}–${esc(
-      formatter(metric.ci_high),
-    )}</span>`;
-  }
-
-  const run = DATA.run;
-  $("#run-meta").innerHTML = [
-    `run ${esc(run.id)}`,
-    esc(run.mode),
-    `${fmt.int(run.item_count)} items`,
-    `cost ${fmt.money(run.cost_usd)}`,
-    `sample sha256 ${esc(String(run.sample_hash).slice(0, 12))}…`,
-  ]
-    .map((piece) => `<span>${piece}</span>`)
-    .join("");
+  $("#example-browser").addEventListener("input", event => { if (event.target.matches("textarea")) event.target.setCustomValidity(""); });
 
   const models = DATA.results.models;
-  $("#models-table-body").innerHTML = models
-    .map((model) => {
-      const metrics = model.metrics;
-      const items = fmt.int(model.items_evaluated);
-      const reduced = model.reduced
-        ? `<span class="badge">budget cut to ${items} of ${fmt.int(model.items_available)}</span>`
-        : "";
-      const needsHuman = metrics.routing.needs_human_share;
-      return `<tr>
-        <td>
-          <span class="system-name">${esc(model.model_id)}</span>
-          <span class="system-sub">${esc(model.role)} · ${items} items ${reduced}</span>
-        </td>
-        <td data-label="Macro-F1">${withCI(metrics.group.macro_f1, (value) => fmt.dec(value, 3))}</td>
-        <td data-label="Safety recall">${withCI(metrics.safety.final_recall, (value) => fmt.dec(value, 3))}</td>
-        <td data-label="Safety precision">${withCI(metrics.safety.final_precision, (value) => fmt.dec(value, 3))}</td>
-        <td data-label="Quote grounding">${withCI(metrics.quote_grounding, (value) => fmt.pct(value, 1))}</td>
-        <td data-label="Needs human">${withCI(needsHuman, (value) => fmt.pct(value, 1))}</td>
-        <td data-label="Cost / 1,000">${withCI(metrics.cost.per_1000_usd, (value) => fmt.money(value))}</td>
-      </tr>`;
-    })
-    .join("");
-
-  const reducedModels = models.filter((model) => model.reduced);
-  const cutNote = reducedModels.length
-    ? ` ${reducedModels
-        .map((model) => `${model.model_id} ran ${fmt.int(model.items_evaluated)} of ${fmt.int(
-          model.items_available,
-        )} items after the budget cut, so its intervals are wider.`)
-        .join(" ")}`
-    : "";
-  const recallText = models
-    .map((model) => fmt.dec(model.metrics.safety.final_recall?.value, 3))
-    .join(" / ");
-  const precisionText = models
-    .map((model) => fmt.dec(model.metrics.safety.final_precision?.value, 3))
-    .join(" / ");
-  $("#models-note").textContent =
-    `Safety is the final hard-rule decision against the coded crash, fire and injury fields. ` +
-    `Final recall is ${recallText}; final precision is ${precisionText}. Recall counts the coded ` +
-    `safety cases the hard rules caught; precision counts how many flagged cases were coded. ` +
-    `Lower precision means a longer reading queue, not a missed safety case.${cutNote}`;
-
+  const primary = models.find(model => model.role === "primary");
+  const comparison = models.find(model => model.role === "comparison");
+  const m = primary.metrics;
+  $("#evaluation-intro").textContent = `Primary model: ${fmt.int(primary.items_evaluated)} complaints. Comparison: ${fmt.int(comparison.items_evaluated)} after a budget cut. These results describe this sample, not real returned parts.`;
+  $("#evidence-strip").innerHTML = [
+    [fmt.int(primary.items_evaluated), "Complaints evaluated", "One held-out snapshot"],
+    [fmt.pct(m.quote_grounding.value), "Clues quote the original", `95% CI ${fmt.pct(m.quote_grounding.ci_low)}–${fmt.pct(m.quote_grounding.ci_high)}`],
+    [fmt.pct(m.routing.needs_human_share.value), "Need human reading", `95% CI ${fmt.pct(m.routing.needs_human_share.ci_low)}–${fmt.pct(m.routing.needs_human_share.ci_high)}`],
+    [fmt.money(m.cost.per_1000_usd.value), "Model cost / 1,000 complaints", `95% CI ${fmt.money(m.cost.per_1000_usd.ci_low)}–${fmt.money(m.cost.per_1000_usd.ci_high)}`],
+  ].map(([value,label,note]) => `<dl class="evidence-stat"><dt>${value}</dt><dd>${label}<span class="ci">${note}</span></dd></dl>`).join("");
   function barRow(label, kind, value) {
-    const width = value === null || value === undefined ? 0 : Math.max(0, Math.min(1, value)) * 100;
-    return `<div class="bar-row" data-kind="${esc(kind)}">
-      <span class="bar-label">${esc(label)}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${width.toFixed(2)}%"></span></span>
-      <span class="bar-value">${fmt.dec(value, 3)}</span>
-    </div>`;
+    return `<div class="bar-row" data-kind="${kind}"><span>${label}</span><span class="bar-track"><span class="bar-fill" style="width:${Math.min(100,Math.max(0,value*100))}%"></span></span><span class="bar-value">${fmt.dec(value)}</span></div>`;
   }
-
-  const primary = models.find((model) => model.role === "primary");
-  const comparison = models.find((model) => model.role === "comparison");
-  const groupBaseline = DATA.results.baselines.group;
-  const safetyBaseline = DATA.results.baselines.safety;
-
-  const roleLabel = { primary: "Primary", comparison: "Comparison" };
-  $("#glance-group").innerHTML = [
-    primary ? barRow(roleLabel.primary, "primary", primary.metrics.group.macro_f1?.value) : "",
-    comparison
-      ? barRow(roleLabel.comparison, "comparison", comparison.metrics.group.macro_f1?.value)
-      : "",
-    barRow("TF-IDF baseline", "baseline", groupBaseline.macro_f1?.value),
-  ].join("");
-
-  $("#glance-safety").innerHTML = [
-    primary
-      ? barRow("Primary · recall", "recall", primary.metrics.safety.final_recall?.value)
-      : "",
-    primary
-      ? barRow("Primary · precision", "precision", primary.metrics.safety.final_precision?.value)
-      : "",
-    comparison
-      ? barRow("Comparison · recall", "recall", comparison.metrics.safety.final_recall?.value)
-      : "",
-    comparison
-      ? barRow(
-          "Comparison · precision",
-          "precision",
-          comparison.metrics.safety.final_precision?.value,
-        )
-      : "",
-    barRow("Keyword · recall", "baseline", safetyBaseline.recall?.value),
-    barRow("Keyword · precision", "precision-baseline", safetyBaseline.precision?.value),
-  ].join("");
-
-  function baselineRow(name, method, score, detail, note) {
-    return `<tr>
-      <td data-label="Baseline"><span class="baseline-name">${esc(name)}</span><span class="baseline-method">${esc(
-        method,
-      )}</span></td>
-      <td data-label="Metric">${score}</td>
-      <td data-label="Detail"><span class="baseline-note">${detail}</span></td>
-      <td data-label="Note"><span class="baseline-note">${note}</span></td>
-    </tr>`;
-  }
-
-  const conditionsBaseline = DATA.results.baselines.conditions;
-  $("#baselines-table-body").innerHTML = [
-    baselineRow(
-      "Component group",
-      `${groupBaseline.method}`,
-      `<span class="baseline-result">macro-F1 ${fmt.dec(groupBaseline.macro_f1?.value, 3)} (${fmt.dec(
-        groupBaseline.macro_f1?.ci_low,
-        3,
-      )}–${fmt.dec(groupBaseline.macro_f1?.ci_high, 3)})</span>`,
-      `Accuracy ${fmt.dec(groupBaseline.accuracy?.value, 3)} (${fmt.dec(
-        groupBaseline.accuracy?.ci_low,
-        3,
-      )}–${fmt.dec(groupBaseline.accuracy?.ci_high, 3)}); coverage ${fmt.dec(
-        groupBaseline.coverage?.value,
-        3,
-      )}.`,
-      `Trained on ${fmt.int(groupBaseline.training_items)} past cases. Cost $0.`,
-    ),
-    baselineRow(
-      "Safety",
-      `${safetyBaseline.method}`,
-      `<span class="baseline-result">recall ${fmt.dec(safetyBaseline.recall?.value, 3)} (${fmt.dec(
-        safetyBaseline.recall?.ci_low,
-        3,
-      )}–${fmt.dec(safetyBaseline.recall?.ci_high, 3)}); precision ${fmt.dec(
-        safetyBaseline.precision?.value,
-        3,
-      )} (${fmt.dec(safetyBaseline.precision?.ci_low, 3)}–${fmt.dec(
-        safetyBaseline.precision?.ci_high,
-        3,
-      )})</span>`,
-      `Flagged ${fmt.int(safetyBaseline.predicted_safety_items)} of ${fmt.int(
-        safetyBaseline.evaluation_items,
-      )} items; ${fmt.int(safetyBaseline.coded_safety_items)} were coded safety-relevant.`,
-      "No model call. Cost $0.",
-    ),
-    baselineRow(
-      "Conditions",
-      `${conditionsBaseline.method}`,
-      `<span class="baseline-result">any condition ${fmt.pct(
-        conditionsBaseline.any_condition_share?.value,
-        1,
-      )} (${fmt.pct(conditionsBaseline.any_condition_share?.ci_low, 1)}–${fmt.pct(
-        conditionsBaseline.any_condition_share?.ci_high,
-        1,
-      )})</span>`,
-      `${fmt.int(conditionsBaseline.items_with_any_condition)} of ${fmt.int(
-        conditionsBaseline.evaluation_items,
-      )} items carry at least one condition.`,
-      `<span class="agreement-tag">agreement, not accuracy</span>`,
-    ),
-  ].join("");
-
+  $("#glance-group").innerHTML = [barRow("Primary", "primary", m.group.macro_f1.value), barRow("Comparison", "comparison", comparison.metrics.group.macro_f1.value), barRow("Free classifier", "baseline", DATA.results.baselines.group.macro_f1.value)].join("");
+  $("#safety-summary").innerHTML = `<div class="safety-pair"><dl><dt>${fmt.dec(m.safety.final_recall.value)}</dt><dd>Safety recall<span class="ci">95% CI ${fmt.dec(m.safety.final_recall.ci_low)}–${fmt.dec(m.safety.final_recall.ci_high)}</span><p class="fine">Share of coded safety cases caught.</p></dd></dl><dl><dt>${fmt.dec(m.safety.final_precision.value)}</dt><dd>Safety precision<span class="ci">95% CI ${fmt.dec(m.safety.final_precision.ci_low)}–${fmt.dec(m.safety.final_precision.ci_high)}</span><p class="fine">Share of flags that matched a coded safety case.</p></dd></dl></div>`;
+  const metricRows = [
+    ["Component group", "Macro-F1", metric => metric.group.macro_f1, fmt.dec],
+    ["Safety recall", "Final hard-rule decision", metric => metric.safety.final_recall, fmt.dec],
+    ["Safety precision", "Final hard-rule decision", metric => metric.safety.final_precision, fmt.dec],
+    ["Quote grounding", "Clues quote the original", metric => metric.quote_grounding, fmt.pct],
+    ["Needs human reading", "Share of all evaluated cases", metric => metric.routing.needs_human_share, fmt.pct],
+    ["Safety priority", "Share routed to priority 1", metric => metric.routing.priority_1_share, fmt.pct],
+    ["Similar-case precision@5", "Past cases sharing the group", metric => metric.similar_precision_at_5, fmt.dec],
+    ["Condition agreement", "Agreement, not accuracy", metric => metric.condition_agreement, fmt.dec],
+    ["Cost / 1,000", "Model calls, USD", metric => metric.cost.per_1000_usd, fmt.money],
+  ];
+  $("#model-scorecard").innerHTML = `<table class="scorecard"><caption>Recorded model results with 95% confidence intervals</caption><thead><tr><th scope="col">Measure</th>${models.map(model => `<th scope="col">${model.role === "primary" ? "Primary" : "Comparison"}<span class="metric-definition">${fmt.int(model.items_evaluated)} complaints</span></th>`).join("")}</tr></thead><tbody>${metricRows.map(([label,definition,get,format]) => `<tr><th scope="row">${label}<span class="metric-definition">${definition}</span></th>${models.map(model => `<td>${ci(get(model.metrics), format)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  const b = DATA.results.baselines;
+  $("#baseline-scorecard").innerHTML = `<table class="baseline-table"><caption>Methods with no model-call cost</caption><thead><tr><th scope="col">Method</th><th scope="col">Result and uncertainty</th><th scope="col">Context</th></tr></thead><tbody>
+    <tr><th scope="row">${esc(b.group.method)}</th><td>Macro-F1 ${ci(b.group.macro_f1)}</td><td>Trained on ${fmt.int(b.group.training_items)} past cases. Accuracy ${ci(b.group.accuracy)}.</td></tr>
+    <tr><th scope="row">Safety keywords</th><td>Recall ${ci(b.safety.recall)}<br>Precision ${ci(b.safety.precision)}</td><td>${fmt.int(b.safety.predicted_safety_items)} flags / ${fmt.int(b.safety.evaluation_items)} complaints; ${fmt.int(b.safety.coded_safety_items)} coded safety cases.</td></tr>
+    <tr><th scope="row">Condition keywords</th><td>Any condition ${ci(b.conditions.any_condition_share,fmt.pct)}</td><td>${fmt.int(b.conditions.items_with_any_condition)} / ${fmt.int(b.conditions.evaluation_items)} complaints. Coverage only; agreement with a model is not accuracy.</td></tr></tbody></table>`;
   const source = DATA.results.source;
-  const sourceFacts = (model) => {
-    const rows = [];
-    rows.push(["items", fmt.int(model.items_evaluated)]);
-    if (source.card) rows.push(["card", `${source.repo || "which-ai-model"}/${source.card}`]);
-    if (source.commit) rows.push(["commit", source.commit]);
-    rows.push(["pick", model.picked_on_the_card || model.pick]);
-    return rows
-      .map(
-        ([key, value]) =>
-          `<div><dt>${esc(key)}</dt><dd>${esc(value)}</dd></div>`,
-      )
-      .join("");
-  };
-
-  const sourceWhy = (model) => {
-    if (model.role === "primary") {
-      return `The defect card's <strong>cheapest good-enough</strong> model: the lowest-cost pick that still meets the card's safety floor.`;
-    }
-    return `The defect card's <strong>most accurate</strong> model on its primary metric.`;
-  };
-
-  $("#source-cards").innerHTML = models
-    .map(
-      (model) => `<article class="source-card">
-        <span class="source-role">${esc(roleLabel[model.role] || model.role)} · ${esc(model.pick)}</span>
-        <h4>${esc(model.model_id)}</h4>
-        <p class="source-why">${sourceWhy(model)}</p>
-        <dl class="source-facts">${sourceFacts(model)}</dl>
-      </article>`,
-    )
-    .join("");
-
-  if (source.picker_rule) {
-    $("#source-cards").insertAdjacentHTML(
-      "afterend",
-      `<p class="method-note">Card rule: ${esc(source.picker_rule)} ${
-        source.no_model_meets_floor
-          ? "The card says no model meets the floor, so safety rests on the hard rules."
-          : ""
-      }</p>`,
-    );
-  }
-
-  /* ---------------------------------------------------------- trend */
+  $("#source-cards").innerHTML = models.map(model => `<article class="source-card"><span class="block-label">${esc(model.role)}</span><h4>${esc(model.model_id)}</h4><p>${model.role === "primary" ? "Lowest-cost model meeting the pinned card’s quality floor." : "Highest-scoring model on the pinned card’s primary metric."}</p><dl class="versions"><div><dt>Evaluated</dt><dd>${fmt.int(model.items_evaluated)} / ${fmt.int(model.items_available)} available${model.reduced ? " · reduced by the budget cap" : ""}</dd></div><div><dt>Source card</dt><dd>${esc(source.repo)}/${esc(source.card)}</dd></div><div><dt>Commit</dt><dd>${esc(source.commit)}</dd></div><div><dt>Card pick</dt><dd>${esc(model.picked_on_the_card)}</dd></div></dl></article>`).join("");
+  $("#run-meta").textContent = `Run ${DATA.run.id} · ${DATA.run.mode} · ${fmt.int(DATA.run.item_count)} complaints · evaluation cost ${fmt.money(DATA.run.cost_usd)} · sample ${DATA.run.sample_hash}`;
 
   const trend = DATA.trend;
-  const example = trend.example;
-  const weeks = example.weeks;
+  const backtest = trend.backtest;
+  $("#trend-comparison").innerHTML = [
+    ["Spike alerts followed by a recall", backtest.alerts.share, `${backtest.alerts.preceding_recall} of ${backtest.alerts.total} alerts`, ""],
+    ["Random weeks in the same series", backtest.base_rate.share, `Base rate · 95% CI ${fmt.pct(backtest.base_rate.ci_low)}–${fmt.pct(backtest.base_rate.ci_high)}`, "baseline"],
+  ].map(([label,value,note,kind]) => `<article class="trend-result ${kind}"><h4>${label}</h4><strong>${fmt.pct(value)}</strong><div class="bar-track"><span class="bar-fill" style="width:${value*100}%"></span></div><p>${note}</p></article>`).join("");
+  $("#trend-reading").textContent = backtest.reading;
+
+  const series = trend.example;
+  const weeks = series.weeks;
   const countsByWeek = weeks.map((week) => (typeof week.count === "number" ? week.count : 0));
   const maxCount = Math.max(1, ...countsByWeek);
   const totalWeeks = Math.max(1, weeks.length);
 
-  $("#chart-title").textContent = `${example.series_label} · ${example.group_label.replace(
+  $("#chart-title").textContent = `${series.series_label} · ${series.group_label.replace(
     /_/g,
     " ",
-  )} · ${fmt.int(example.total_complaints)} complaints`;
+  )} · ${fmt.int(series.total_complaints)} complaints`;
 
   const tickStep = Math.max(1, Math.ceil(maxCount / 4));
   const ticks = [];
@@ -721,8 +332,8 @@
     })
     .join("");
 
-  const alertIndex = weeks.findIndex((week) => week.week === example.alert.week);
-  const recallDate = example.recall.report_date;
+  const alertIndex = weeks.findIndex((week) => week.week === series.alert.week);
+  const recallDate = series.recall.report_date;
   let recallIndex = weeks.findIndex((week) => week.week >= recallDate);
   if (recallIndex < 0) recallIndex = weeks.length - 1;
 
@@ -763,41 +374,19 @@
     })
     .join("");
 
-  $("#legend-alert").textContent = `${example.alert.week} · ${fmt.int(
-    example.alert.count,
+  $("#legend-alert").textContent = `${series.alert.week} · ${fmt.int(
+    series.alert.count,
   )} complaints`;
-  $("#legend-recall").textContent = `${example.recall.report_date} · +${fmt.int(
-    example.recall.lead_days,
+  $("#legend-recall").textContent = `${series.recall.report_date} · +${fmt.int(
+    series.recall.lead_days,
   )} days`;
-  $("#example-reading").textContent = example.reading;
+  $("#example-reading").textContent = series.reading;
 
-  const backtest = trend.backtest;
-  const base = backtest.base_rate;
-  $("#trend-stats").innerHTML = [
-    [
-      fmt.pct(backtest.alerts.share),
-      `alerts followed by a recall (${fmt.int(backtest.alerts.preceding_recall)} of ${fmt.int(
-        backtest.alerts.total,
-      )})`,
-    ],
-    [
-      fmt.pct(base.share),
-      `random same-series weeks (base rate) <span class="ci">${fmt.pct(
-        base.ci_low,
-      )}–${fmt.pct(base.ci_high)}</span>`,
-    ],
-    [
-      `${fmt.dec(backtest.alerts.median_lead_days, 0)} days`,
-      "median lead time from the alert week to the recall",
-    ],
-  ]
-    .map(
-      ([value, label]) => `<dl class="stat"><dt>${esc(value)}</dt><dd>${label}</dd></dl>`,
-    )
-    .join("");
-
-  $("#trend-reading").textContent = backtest.reading;
-  $("#trend-method").textContent = `Rule: ${trend.backtest.method.rule}. Backtest: ${
-    trend.backtest.method.base_rate
-  }, ${fmt.int(trend.backtest.method.recall_window_days)}-day window.`;
+  $("#weekly-data").innerHTML = weeks.map(week => `<tr><th scope="row">${esc(week.week)}</th><td>${fmt.int(week.count)}</td><td>${week.week === series.alert.week ? "Alert week" : week.week === weeks[recallIndex]?.week ? `Recall ${esc(series.recall.report_date)}` : "—"}</td></tr>`).join("");
+  $("#trend-method").textContent = `Rule: ${backtest.method.rule}. Backtest: ${backtest.method.base_rate}; ${fmt.int(backtest.method.recall_window_days)}-day window. Median lead time for alerts preceding a recall: ${fmt.int(backtest.alerts.median_lead_days)} days. The trend signal is weak and does not establish an early-warning system.`;
+  const download = $("#download-evidence");
+  const blobURL = URL.createObjectURL(new Blob([JSON.stringify(DATA, null, 2)], { type: "application/json" }));
+  download.href = blobURL;
+  download.hidden = false;
+  addEventListener("pagehide", event => { if (!event.persisted) URL.revokeObjectURL(blobURL); });
 })();

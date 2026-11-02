@@ -24,4 +24,9 @@ build/
 # OS noise
 .DS_Store
 
+# Local design review evidence
+.taste-skill/
+.ui-shots/
+.playwright-cli/
+
 # `dist/` is deliberately NOT ignored: it is the built page, committed by the page lane.
