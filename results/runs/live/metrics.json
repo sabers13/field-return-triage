@@ -1,0 +1,235 @@
+{
+  "budget": {
+    "cap_usd": 3.0,
+    "models": [
+      {
+        "estimated_cost_usd": 0.36768,
+        "items_available": 400,
+        "items_run": 400,
+        "model_id": "muse-spark-1.3-contributor",
+        "reduced": false,
+        "role": "primary"
+      },
+      {
+        "estimated_cost_usd": 2.448,
+        "items_available": 400,
+        "items_run": 200,
+        "model_id": "gemini-4-argon",
+        "reduced": true,
+        "role": "comparison"
+      }
+    ],
+    "note": "a reduced model ran on fewer items after the PLAN section 8 budget cut",
+    "spent_usd": 1.32254292
+  },
+  "fixture": false,
+  "item_count": 400,
+  "mode": "replay",
+  "models": {
+    "gemini-4-argon": {
+      "condition_agreement": {
+        "ci_high": 0.9005555555555556,
+        "ci_low": 0.8738888888888889,
+        "value": 0.8872222222222224
+      },
+      "cost": {
+        "per_1000_usd": {
+          "ci_high": 6.343236,
+          "ci_low": 5.897749,
+          "value": 6.124689999999999
+        },
+        "total_usd": {
+          "ci_high": 1.224938,
+          "ci_low": 1.224938,
+          "value": 1.224938
+        }
+      },
+      "estimated_cost_usd": 4.896,
+      "group": {
+        "accuracy": {
+          "ci_high": 0.8843258796841297,
+          "ci_low": 0.7828592983793289,
+          "value": 0.84
+        },
+        "answered_accuracy": {
+          "ci_high": 0.9653428109025258,
+          "ci_low": 0.8933245887815037,
+          "value": 0.9385474860335196
+        },
+        "coverage": {
+          "ci_high": 0.9302925120731899,
+          "ci_low": 0.8448196800887696,
+          "value": 0.895
+        },
+        "macro_f1": {
+          "ci_high": 0.9011237347340426,
+          "ci_low": 0.7713901278610443,
+          "value": 0.8507048477048477
+        }
+      },
+      "invalid_answers": 0,
+      "items_evaluated": 200,
+      "latency_ms": {
+        "p50": {
+          "ci_high": 6321.4085,
+          "ci_low": 5395.041125000001,
+          "value": 5778.795
+        },
+        "p95": {
+          "ci_high": 12632.29,
+          "ci_low": 10078.393797499999,
+          "value": 11339.900099999999
+        }
+      },
+      "model_id": "gemini-4-argon",
+      "quote_grounding": {
+        "ci_high": 1.0,
+        "ci_low": 0.99491763943898,
+        "value": 1.0
+      },
+      "role": "comparison",
+      "routing": {
+        "needs_human_share": {
+          "ci_high": 0.524213886275119,
+          "ci_low": 0.387482193098835,
+          "value": 0.455
+        },
+        "priority_1_share": {
+          "ci_high": 0.44893281984380773,
+          "ci_low": 0.31559005848673627,
+          "value": 0.38
+        }
+      },
+      "safety": {
+        "final_precision": {
+          "ci_high": 0.5971130697102026,
+          "ci_low": 0.3778372877915117,
+          "value": 0.4868421052631579
+        },
+        "final_recall": {
+          "ci_high": 1.0,
+          "ci_low": 0.9059421741627975,
+          "value": 1.0
+        },
+        "model_precision": {
+          "ci_high": 0.6824054258436073,
+          "ci_low": 0.4483297467424586,
+          "value": 0.5692307692307692
+        },
+        "model_recall": {
+          "ci_high": 1.0,
+          "ci_low": 0.9059421741627975,
+          "value": 1.0
+        }
+      },
+      "similar_precision_at_5": {
+        "ci_high": 0.8472942523696041,
+        "ci_low": 0.800218354614785,
+        "value": 0.825
+      }
+    },
+    "muse-spark-1.3-contributor": {
+      "condition_agreement": {
+        "ci_high": 0.9238888888888889,
+        "ci_low": 0.9052708333333331,
+        "value": 0.9147222222222222
+      },
+      "cost": {
+        "per_1000_usd": {
+          "ci_high": 0.251218788125,
+          "ci_low": 0.23723947437499998,
+          "value": 0.2440123
+        },
+        "total_usd": {
+          "ci_high": 0.09760492,
+          "ci_low": 0.09760492,
+          "value": 0.09760492
+        }
+      },
+      "estimated_cost_usd": 0.36768,
+      "group": {
+        "accuracy": {
+          "ci_high": 0.8726672444005619,
+          "ci_low": 0.8008643954521164,
+          "value": 0.84
+        },
+        "answered_accuracy": {
+          "ci_high": 0.9718302260107108,
+          "ci_low": 0.9274466628052314,
+          "value": 0.9545454545454546
+        },
+        "coverage": {
+          "ci_high": 0.9082846092461745,
+          "ci_low": 0.8444860470597602,
+          "value": 0.88
+        },
+        "macro_f1": {
+          "ci_high": 0.8951605542422156,
+          "ci_low": 0.8251676331513421,
+          "value": 0.862529020826144
+        }
+      },
+      "invalid_answers": 0,
+      "items_evaluated": 400,
+      "latency_ms": {
+        "p50": {
+          "ci_high": 9042.427,
+          "ci_low": 8295.128499999999,
+          "value": 8623.467499999999
+        },
+        "p95": {
+          "ci_high": 16502.783,
+          "ci_low": 14274.105,
+          "value": 15310.75809999999
+        }
+      },
+      "model_id": "muse-spark-1.3-contributor",
+      "quote_grounding": {
+        "ci_high": 1.0,
+        "ci_low": 0.9971243153180127,
+        "value": 1.0
+      },
+      "role": "primary",
+      "routing": {
+        "needs_human_share": {
+          "ci_high": 0.7047043807229885,
+          "ci_low": 0.6122516850900368,
+          "value": 0.66
+        },
+        "priority_1_share": {
+          "ci_high": 0.6053980915565909,
+          "ci_low": 0.5085079945949651,
+          "value": 0.5575
+        }
+      },
+      "safety": {
+        "final_precision": {
+          "ci_high": 0.4235981866954752,
+          "ci_low": 0.29867480375554245,
+          "value": 0.35874439461883406
+        },
+        "final_recall": {
+          "ci_high": 0.9999999999999999,
+          "ci_low": 0.9541818704644728,
+          "value": 1.0
+        },
+        "model_precision": {
+          "ci_high": 0.4403434328305417,
+          "ci_low": 0.3117698687772686,
+          "value": 0.37383177570093457
+        },
+        "model_recall": {
+          "ci_high": 0.9999999999999999,
+          "ci_low": 0.9541818704644728,
+          "value": 1.0
+        }
+      },
+      "similar_precision_at_5": {
+        "ci_high": 0.8386226946325456,
+        "ci_low": 0.8051408098710463,
+        "value": 0.8225
+      }
+    }
+  },
+  "run_id": "live"
+}
