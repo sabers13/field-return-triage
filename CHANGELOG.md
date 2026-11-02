@@ -36,7 +36,7 @@ published number are complete.
 ### Notes
 
 - Public commands are replay-only: `make all`, `make test` and `make release-check` need
-  no key and no network. The one paid run is recorded in `reports/RUN.md`.
+  no key and no network. The one paid run is recorded in `results/runs/live/`.
 - The complaint text is public NHTSA data used as a stand-in for a lab's return reports.
   The rulebook and component groups are examples meant to be adapted.
 - Every number in the README and `project-facts.yml` is checked against the committed

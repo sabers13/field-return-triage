@@ -1,8 +1,7 @@
 # Field Return Triage - one command per job.
 #
 # `make all` rebuilds data checks, the index, trend, results and the page in replay mode
-# (no key, no network). `make release-check` is what CI runs. Lane stubs print their owner
-# and fail until that lane lands, so a stub can never be mistaken for a finished job.
+# (no key, no network). `make release-check` is what CI runs.
 
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
@@ -21,19 +20,19 @@ help: ## Show this help
 setup: ## Create the venv and install exact locked versions
 	uv sync
 
-fetch-data: ## Download the NHTSA snapshot into data/raw/ (lane R1)
+fetch-data: ## Download the NHTSA snapshot into data/raw/
 	uv run python scripts/fetch_nhtsa.py
 
-data: ## Derive the library, eval set and trend tables (lane R1)
+data: ## Derive the library, eval set and trend tables
 	uv run python -m field_return_triage.data.cli
 
-data-check: ## Verify the committed data against data/CHECKSUMS.txt (lane R6)
+data-check: ## Verify the committed data against data/CHECKSUMS.txt
 	uv run python -m field_return_triage.pipeline.cli data-check
 
-index: ## Embed the library into the local vector cache (lane R3)
+index: ## Embed the library into the local vector cache
 	uv run --extra index python -m field_return_triage.similar.cli
 
-index-cached: ## Reuse the embedding index, build it only when missing (lane R6)
+index-cached: ## Reuse the embedding index, build it only when missing
 	uv run --extra index python -m field_return_triage.pipeline.cli index-cached
 
 test: ## Run the test suite with the network blocked
@@ -59,32 +58,32 @@ scan-secrets: ## Fail on credential-looking strings
 facts: ## Check every published number against the results file that proves it
 	$(PYTHON) scripts/check_facts.py
 
-eval-replay: ## Score the eval set from committed recordings (lane R6)
+eval-replay: ## Score the eval set from committed recordings
 	uv run --extra index python -m field_return_triage.pipeline.cli eval-replay
 
-probe: ## One paid call per locked model; records recordings/probes.json (lane R7)
+probe: ## One paid call per locked model; records recordings/probes.json
 	uv run python -m field_return_triage.pipeline.cli probe
 
-live: ## The one paid run; needs a key and the budget (lane R7)
+live: ## The one paid run; needs a key and the budget
 	uv run python -m field_return_triage.pipeline.cli live
 
-trend: ## Detect weekly spikes and backtest them against recalls (lane R5)
+trend: ## Detect weekly spikes and backtest them against recalls
 	uv run python -m field_return_triage.trend.cli
 
-results: ## Export results and the summary from replay (lane R6)
+results: ## Export results and the summary from replay
 	uv run --extra index python -m field_return_triage.pipeline.cli results
 
-page-data: ## Build results/page/page-data.json (lane R8)
+page-data: ## Build results/page/page-data.json
 	uv run python -m field_return_triage.report.cli page-data
 
-page: ## Build dist/field-return-triage/index.html (lane R8)
+page: ## Build dist/field-return-triage/index.html
 	uv run python -m field_return_triage.report.cli page
 
-all: data-check index-cached trend results ## Rebuild everything in replay mode (lane R6)
+all: data-check index-cached trend results ## Rebuild everything in replay mode
 	@if [ -d src/field_return_triage/report ]; then \
 		$(MAKE) page-data page; \
 	else \
-		echo "all: results are ready; page-data/page wait for lane R8"; \
+		echo "all: results are ready; the report package is missing, so the page is not built"; \
 	fi
 
 release-check: lint typecheck test scan-forbidden scan-secrets facts ## CI gate

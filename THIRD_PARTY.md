@@ -57,8 +57,8 @@ The public-domain label page defines the scope and the caveat
 > it. This includes publicity or privacy rights under state law."
 
 **Conclusion.** Both datasets are U.S. Government works in the public domain, and derived
-extracts may be redistributed. The privacy sentence is the reason for the hard rule in
-`PLAN.md` section 5, not a redistribution restriction: the complaints contain personal
+extracts may be redistributed. The privacy sentence is the reason for the data-handling rule
+in `METHOD.md`, not a redistribution restriction: the complaints contain personal
 data contributed by the public, so identity and location columns are dropped and a
 narrative that matches the PII screen is discarded, never committed.
 

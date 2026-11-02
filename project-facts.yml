@@ -18,7 +18,7 @@ tags: [python, llm, nlp, data_engineering, testing, ci]
 keywords: "field return triage, complaint analysis, failure analysis, no trouble found, LLM extraction, quote grounding, safety triage, nearest-neighbour retrieval, trend detection, reproducible replay"
 claim_limits: "Independent portfolio project. The complaint text is public NHTSA vehicle owner data used as a stand-in for a lab's own return reports, not real return data. The evaluation set is safety-oversampled and the comparison model is scored on fewer items after a budget cut. Safety precision is low by design: the hard rules send a case to a person rather than risk a miss. Every result is replayed from committed recordings with no key and no network, and nothing here is a production deployment."
 
-# Three CV bullets: outcome, technical, stack. Every number in a bullet's text is
+# Three summary bullets: outcome, technical, stack. Every number in a bullet's text is
 # declared with the file that proves it and the text that file contains.
 bullets:
   - kind: outcome

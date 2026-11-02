@@ -1,7 +1,6 @@
 # Method
 
-This is the plain-words companion to `PLAN.md` sections 4–7, which are frozen. It
-explains what the code does and why, without changing the method. Versions named here
+This document explains the method in plain words: what the code does and why. Versions named here
 (`e1` prompt, `rb1` rulebook, `hr1` hard rules) are the versions the committed results
 were produced with.
 
@@ -210,7 +209,7 @@ The model choice is a fixed rule, not a preference:
 and the exact source path and commit of the card that chose them. Both are called through
 one OpenAI-compatible gateway endpoint
 (`https://opencode.ai/inference/go/openai/v1/chat/completions`); a model that fails there
-falls back to its native format, and the fallback is recorded as a deviation.
+falls back to its native format, and the fallback is recorded in the run manifest.
 
 The 400 evaluation items run through the primary. The comparison runs as far as the
 budget allows: the guard estimates the upper-bound cost before each model and reduces the
@@ -230,5 +229,4 @@ rebuilds `results/` byte-identically; `results/MANIFEST.sha256` proves the tree.
 embedding index is rebuilt once by `make index` and cached outside git. Replay is the
 default, and the public commands never call a paid model.
 
-The live run's budget, interruptions and the exact spend are recorded in
-[`reports/RUN.md`](reports/RUN.md).
+The live evaluation's exact spend is recorded in `results/runs/live/manifest.json`.

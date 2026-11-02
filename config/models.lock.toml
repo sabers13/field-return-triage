@@ -1,4 +1,4 @@
-# R7 model lock (PLAN.md section 7).
+# Model lock: the pinned model ids and settings.
 #
 # Rule: primary = the which-ai-model defect card's "cheapest" pick (the cheapest model
 # that meets the card's safety floor); comparison = that card's "most accurate" pick.

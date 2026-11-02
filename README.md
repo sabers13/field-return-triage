@@ -14,13 +14,12 @@ the exact words they came from, a safety flag, the five most similar past cases,
 next test to run with its reasons. A technician decides every case. No code path here
 closes, scraps or returns a part.
 
-It is an independent portfolio project. The complaint text is a public stand-in (NHTSA
-vehicle owner complaints), not real return data; the rulebook and component groups are
-examples to adapt to a lab's own parts.
+The complaint text is a public stand-in (NHTSA vehicle owner complaints), not real
+return data; the rulebook and component groups are examples to adapt to a lab's own
+parts.
 
-- Live page: <https://sabersojudi.com/field-return-triage/>
-- Source: <https://github.com/sabers13/field-return-triage>
-- Full numbers: [`results/SUMMARY.md`](results/SUMMARY.md)
+[Live page](https://sabersojudi.com/field-return-triage/) ·
+[Method](METHOD.md) · [Full results](results/SUMMARY.md)
 
 ## Quickstart
 
@@ -51,7 +50,7 @@ nearest past cases, and the versions of the model, prompt, rulebook and hard rul
 
 The example is one of the 400 recorded evaluation complaints, so replay answers it. The
 quickstart is replay-only by design: arbitrary text has no recorded model answer and
-needs a record run with a key (`frt eval --mode record`, see `docs/INTERFACES.md`).
+needs a record run with a key (`frt eval --mode record`).
 The `make index` step is also what installs the CPU embedding extra; without it
 `frt triage` cannot embed the query even when the index exists.
 
@@ -140,22 +139,22 @@ What the table says, in words:
   reading.
 - **Cost.** The primary costs USD 0.2440 per 1,000 items; the comparison costs USD 6.1247
   and was cut to 200 items. The live evaluation cost USD 1.32254292; the whole paid run,
-  including the probes and smoke rounds, cost USD 1.584697 of the USD 3 cap
-  (`reports/RUN.md`).
+  including the probes and smoke rounds, cost USD 1.584697 of the USD 3 cap.
 - **Trend watch.** 93 spike alerts, 35 of which precede a recall (37.6%), against a 32.3%
   base rate for random weeks of the same series. The comparison to the base rate is the
   headline; the raw share alone would overstate the signal.
 
 The per-model tables, confidence intervals, routing shares, latency and the cost-free
-baselines are in `results/SUMMARY.md`. The run record, including the budget cut and the
-interrupted-and-resumed live run, is in [`reports/RUN.md`](reports/RUN.md).
+baselines are in `results/SUMMARY.md`; the live run's manifest is in
+`results/runs/live/manifest.json`.
 
-## Screenshots
+## The page
 
-The release page is generated into `dist/field-return-triage/`. Page screenshots, at
-360 px and 1280 px in light and dark, are release evidence saved outside the repository
-(the task folder, not `results/page/screenshots/`); the page itself ships no images and
-links none.
+`make all` also builds a single self-contained page into `dist/field-return-triage/`: a
+worked example, the triage queue with each card's quoted clues, the measured results and
+the method. It ships no images and needs no server; the
+[live page](https://sabersojudi.com/field-return-triage/) is that file. No screenshots are
+committed; captures of the page belong in `results/page/screenshots/`.
 
 ## Limits
 
@@ -210,7 +209,7 @@ own records, in the same fields (`id`, `narrative`, `group`, plus the optional c
 flags). Then record model answers once with `frt eval --mode record` and replay them
 from then on. The paid path, the model lock (`config/models.lock.toml`), the price table
 (`config/prices.toml`) and the budget guard (`config/budget.toml`) are described in
-`docs/`.
+`METHOD.md`.
 
 What does **not** change with configuration: the hard rules (`hr1`) that make safety win
 and forbid any close, scrap or return state, the quote check, and the technician's
@@ -225,9 +224,11 @@ decision. Changing those is a code and method change, not an adaptation.
 | `config/` | rulebook, model lock, prices, budget, forbidden-name hashes |
 | `recordings/` | committed, scrubbed model responses (one row per call) |
 | `results/` | committed run metrics, baselines, trend backtest, summary, manifest |
-| `docs/` | interface contract, gateway notes, the example complaint |
-| `plan/` | the task briefs; `PLAN.md` holds the frozen method |
-| `reports/` | lane reports and the live-run record |
+| `web/` | the page template, styles and fonts |
+| `dist/` | the built single-file page |
+| `scripts/` | data fetch, facts check and the name and secret scanners |
+| `tests/` | the offline test suite |
+| `docs/` | the example complaint used in the quickstart |
 
 ## Licence and credit
 
