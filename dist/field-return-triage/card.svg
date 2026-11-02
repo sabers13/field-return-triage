@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Field Return Triage</title>
+  <desc id="desc">A cold-weather complaint clue leads to a suggested low-temperature test, with a technician making the decision.</desc>
+  <rect width="1200" height="630" fill="#f3f4f6"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="72" y="112" font-size="42" font-weight="600" fill="#111827">Field Return Triage</text>
+    <text x="72" y="162" font-size="26" fill="#374151">From complaint to next test.</text>
+    <rect x="72" y="228" width="480" height="242" rx="24" fill="#ffffff"/>
+    <rect x="648" y="228" width="480" height="242" rx="24" fill="#dbeafe"/>
+    <path d="M575 350h50m-12-12 12 12-12 12" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="104" y="278" font-size="21" fill="#626d7f">A clue in the complaint</text>
+    <text x="104" y="340" font-size="29" font-weight="500" fill="#111827">Door fails to open</text>
+    <rect x="100" y="363" width="358" height="44" rx="8" fill="#fef3c7"/>
+    <text x="112" y="394" font-size="26" fill="#92400e">“extremely cold weather”</text>
+    <text x="680" y="278" font-size="21" fill="#1e40af">Suggested test</text>
+    <text x="680" y="340" font-size="29" font-weight="500" fill="#1e40af">Low-temperature operation</text>
+    <text x="680" y="386" font-size="29" font-weight="500" fill="#1e40af">and temperature cycling</text>
+    <text x="72" y="550" font-size="23" fill="#374151">Checked words. A traceable suggestion. The technician decides.</text>
+  </g>
+</svg>

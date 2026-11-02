@@ -101,3 +101,12 @@ scans, real interactions and desktop/tablet/phone screenshots in both themes.
 Inspect the production static file at /field-return-triage/ and measure mobile
 loading. Report generic Taste warnings that contradict the chosen portfolio
 contract instead of redesigning the brand to satisfy them.
+
+## Publication authorization — 2026-11-02
+
+The owner subsequently authorized publishing the project repository and website.
+That instruction supersedes the original local-only stopping point for this
+publication. The additional scope is the source remote, the portfolio's
+`field-return-triage/` directory and one root Featured Projects card. Keep the
+custom domain, other projects, evidence and Firstmate settings unchanged. Public
+source actions now link to `https://github.com/sabers13/field-return-triage`.
