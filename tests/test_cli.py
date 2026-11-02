@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+from rich.text import Text
 from typer.testing import CliRunner, Result
 
 from field_return_triage import __version__
@@ -37,12 +39,22 @@ def test_help_lists_every_lane_command() -> None:
         assert command in result.output
 
 
-def test_eval_lists_its_models_and_run_id_options() -> None:
+@pytest.mark.parametrize("force_color", [False, True])
+def test_eval_lists_its_models_and_run_id_options(
+    monkeypatch: pytest.MonkeyPatch, force_color: bool
+) -> None:
+    if force_color:
+        monkeypatch.setenv("GITHUB_ACTIONS", "true")
+        monkeypatch.setenv("FORCE_COLOR", "1")
+    else:
+        monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+        monkeypatch.delenv("FORCE_COLOR", raising=False)
     result = runner.invoke(app, ["eval", "--help"])
     assert result.exit_code == 0
-    assert "--models" in result.output
-    assert "--run-id" in result.output
-    assert "--mode" in result.output
+    output = Text.from_ansi(result.output).plain
+    assert "--models" in output
+    assert "--run-id" in output
+    assert "--mode" in output
 
 
 def test_eval_rejects_an_unknown_mode() -> None:
