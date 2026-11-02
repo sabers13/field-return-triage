@@ -26,18 +26,47 @@
   const navLinks = $$('.nav a, .rail-nav a');
   const sections = ["overview", "queue", "results", "method"].map(id => document.getElementById(id));
   let navTicking = false;
-  function updateNavigation() {
-    const top = root.clientWidth <= 600 ? 150 : 120;
-    let current = sections[0];
-    for (const section of sections) if (section.getBoundingClientRect().top <= top) current = section;
+  let requestedSection = sections.find(section => `#${section.id}` === location.hash);
+  function selectNavigation(section) {
     navLinks.forEach(link => {
-      if (link.hash === `#${current.id}`) link.setAttribute("aria-current", "location");
+      if (link.hash === `#${section.id}`) link.setAttribute("aria-current", "location");
       else link.removeAttribute("aria-current");
     });
+  }
+  function updateNavigation() {
+    const top = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
+    const atBottom = scrollY > 0 && Math.ceil(scrollY + innerHeight) >= root.scrollHeight - 2;
+    const requestedReached = requestedSection && (
+      Math.abs(requestedSection.getBoundingClientRect().top - top) <= 2 ||
+      (requestedSection === sections[0] && scrollY <= 1) ||
+      (requestedSection === sections.at(-1) && atBottom)
+    );
+    if (requestedReached) requestedSection = null;
+    let current = sections[0];
+    for (const section of sections) if (section.getBoundingClientRect().top <= top + 2) current = section;
+    if (atBottom) current = sections.at(-1);
+    selectNavigation(requestedSection || current);
     navTicking = false;
   }
+  navLinks.forEach(link => link.addEventListener("click", event => {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    requestedSection = sections.find(section => `#${section.id}` === link.hash);
+    if (requestedSection) selectNavigation(requestedSection);
+  }));
+  const resumeScrollNavigation = () => { requestedSection = null; };
+  addEventListener("wheel", resumeScrollNavigation, { passive: true });
+  addEventListener("touchstart", resumeScrollNavigation, { passive: true });
+  addEventListener("keydown", event => {
+    if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) resumeScrollNavigation();
+  });
+  addEventListener("hashchange", () => {
+    requestedSection = sections.find(section => `#${section.id}` === location.hash);
+    updateNavigation();
+  });
+  addEventListener("scrollend", () => { requestedSection = null; updateNavigation(); });
   addEventListener("scroll", () => { if (!navTicking) { requestAnimationFrame(updateNavigation); navTicking = true; } }, { passive: true });
   addEventListener("resize", updateNavigation);
+  addEventListener("load", updateNavigation);
   updateNavigation();
 
   let DATA;
