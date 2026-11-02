@@ -18,7 +18,7 @@ from typing import Final
 import typer
 
 from field_return_triage.contracts import Complaint
-from field_return_triage.similar.embedder import Embedder
+from field_return_triage.similar.embedder import Embedder, default_embedder
 from field_return_triage.similar.index import DEFAULT_CHECKSUMS, build_index
 
 __all__ = ["DEFAULT_LIBRARY", "index_main"]
@@ -57,7 +57,8 @@ def index_main(
     library = _read_library(library_path)
     started = perf_counter()
     try:
-        path = build_index(library, embedder=embedder, checksums=checksums)
+        chosen = embedder if embedder is not None else default_embedder(allow_download=True)
+        path = build_index(library, embedder=chosen, checksums=checksums)
     except (FileNotFoundError, RuntimeError, ValueError) as exc:
         typer.echo(f"frt index: {exc}", err=True)
         raise typer.Exit(code=1) from exc

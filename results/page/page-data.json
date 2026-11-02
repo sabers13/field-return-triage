@@ -547,10 +547,9 @@
           {
             "quotes": [
               "driver’s side door failed to open or close as needed",
-              "extremely cold weather",
-              "approximately 40,000"
+              "extremely cold weather"
             ],
-            "text": "clear clues: 3 clues passed the quote check"
+            "text": "clear clues: 2 clues passed the quote check"
           }
         ],
         "received": "2025-01-02",
@@ -813,10 +812,9 @@
             "quotes": [
               "the driver's side headlight became inoperable",
               "presence of condensation in the headlights",
-              "while driving 35 MPH",
-              "The failure mileage was approximately 34,000."
+              "while driving 35 MPH"
             ],
-            "text": "clear clues: 4 clues passed the quote check"
+            "text": "clear clues: 3 clues passed the quote check"
           }
         ],
         "received": "2025-01-07",
@@ -935,10 +933,9 @@
           {
             "quotes": [
               "the low-beam headlights failed to illuminate as needed",
-              "the driver’s side low-beam headlight had stopped functioning as designed",
-              "approximately 175,000"
+              "the driver’s side low-beam headlight had stopped functioning as designed"
             ],
-            "text": "clear clues: 3 clues passed the quote check"
+            "text": "clear clues: 2 clues passed the quote check"
           }
         ],
         "received": "2025-01-21",
@@ -1471,9 +1468,9 @@
           },
           "routing": {
             "needs_human_share": {
-              "ci_high": 0.7047,
-              "ci_low": 0.6123,
-              "value": 0.66
+              "ci_high": 0.7119,
+              "ci_low": 0.6199,
+              "value": 0.6675
             },
             "priority_1_share": {
               "ci_high": 0.6054,
@@ -1579,9 +1576,9 @@
           },
           "routing": {
             "needs_human_share": {
-              "ci_high": 0.5242,
-              "ci_low": 0.3875,
-              "value": 0.455
+              "ci_high": 0.5292,
+              "ci_low": 0.3923,
+              "value": 0.46
             },
             "priority_1_share": {
               "ci_high": 0.4489,

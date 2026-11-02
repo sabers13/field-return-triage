@@ -90,9 +90,9 @@
       "role": "comparison",
       "routing": {
         "needs_human_share": {
-          "ci_high": 0.524213886275119,
-          "ci_low": 0.387482193098835,
-          "value": 0.455
+          "ci_high": 0.5291771081104667,
+          "ci_low": 0.39233051799971463,
+          "value": 0.46
         },
         "priority_1_share": {
           "ci_high": 0.44893281984380773,
@@ -192,9 +192,9 @@
       "role": "primary",
       "routing": {
         "needs_human_share": {
-          "ci_high": 0.7047043807229885,
-          "ci_low": 0.6122516850900368,
-          "value": 0.66
+          "ci_high": 0.7118820418144254,
+          "ci_low": 0.6199313395835853,
+          "value": 0.6675
         },
         "priority_1_share": {
           "ci_high": 0.6053980915565909,

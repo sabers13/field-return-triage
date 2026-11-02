@@ -96,6 +96,34 @@ def test_fixture_runs_are_labelled_plainly(tmp_path: Path) -> None:
     assert "not model" in text
 
 
+def test_the_trend_lines_read_the_written_interval_and_median_lead(tmp_path: Path) -> None:
+    _metrics(tmp_path, fixture=False)
+    trend = tmp_path / "trend"
+    trend.mkdir()
+    (trend / "backtest.json").write_text(
+        json.dumps(
+            {
+                "alerts": {
+                    "total": 93,
+                    "preceding_recall": 35,
+                    "share": 0.376344,
+                    "median_lead_days": 70.0,
+                },
+                "base_rate": {
+                    "share": 0.322581,
+                    "ci95": {"low": 0.236249, "high": 0.422987},
+                },
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    text = build_summary(tmp_path / "runs", tmp_path)
+    assert "32.3% (95% CI 23.6%-42.3%)" in text
+    assert "median lead 70.0 days" in text
+    assert "n/a-n/a" not in text
+
+
 def test_write_summary_returns_the_file(tmp_path: Path) -> None:
     path = write_summary(runs_dir=tmp_path / "runs", results_dir=tmp_path)
     assert path == tmp_path / "SUMMARY.md"

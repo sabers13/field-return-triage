@@ -78,6 +78,9 @@ COMPARISON_REDUCED_ITEMS: Final = 200
 #: Per-call cost and duration sidecar inside the recordings directory.
 CALLS_FILE: Final = "calls.jsonl"
 
+#: The PLAN section 8 plan for one run: how many items each model was scheduled to run.
+SCHEDULE_FILE: Final = "schedule.json"
+
 
 class BudgetExceededError(RuntimeError):
     """The conservative estimate would cross the cap, so no call was made."""
@@ -321,6 +324,7 @@ class _RunState:
     cards_file: Path
     manifest_file: Path
     metrics_file: Path
+    schedule_file: Path
 
 
 def _run_state(out_dir: Path, run_id: str) -> _RunState:
@@ -330,7 +334,29 @@ def _run_state(out_dir: Path, run_id: str) -> _RunState:
         cards_file=run_dir / "cards.jsonl",
         manifest_file=run_dir / "manifest.json",
         metrics_file=run_dir / "metrics.json",
+        schedule_file=run_dir / SCHEDULE_FILE,
     )
+
+
+def _read_schedule(path: Path) -> dict[str, int]:
+    """How many items each model was scheduled to run, or ``{}`` when unrecorded."""
+    if not path.is_file():
+        return {}
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    if not isinstance(loaded, dict):
+        return {}
+    return {
+        str(model): count
+        for model, count in loaded.items()
+        if isinstance(count, int) and not isinstance(count, bool) and count >= 0
+    }
+
+
+def _write_schedule(path: Path, schedule: Mapping[str, int]) -> None:
+    _write_json(path, dict(sorted(schedule.items())))
 
 
 def run_eval(
@@ -397,6 +423,15 @@ def run_eval(
     done = {(card.model_id, card.complaint.id) for card in existing}
     recorded = read_calls(calls_path(paths.recordings))
     calls = _calls_for_run(recorded, run_id)
+    schedule = _read_schedule(state.schedule_file)
+    if mode is RunMode.REPLAY and not schedule:
+        # A replay regenerates the plan from the committed calls, so `rm -rf results`
+        # followed by `make all` writes the same schedule file again.
+        schedule = {
+            model.model_id: sum(1 for key in calls if key[0] == model.model_id)
+            for model in settings
+        }
+        schedule = {model: count for model, count in schedule.items() if count}
 
     budget = load_budget(budget_path)
     is_replay = mode is RunMode.REPLAY
@@ -424,9 +459,13 @@ def run_eval(
     try:
         for setting in settings:
             recorded_plan = bool(calls) and is_replay
+            planned = schedule.get(setting.model_id)
+            # The recorded plan is a prefix of the item list: honour it instead of
+            # re-estimating the items the PLAN section 8 cut removed.
+            scheduled_items = items[:planned] if planned is not None else items
             remaining = [
                 item
-                for item in items
+                for item in scheduled_items
                 if (setting.model_id, item.id) not in done
                 and ((setting.model_id, item.id) in calls if recorded_plan else True)
             ]
@@ -437,6 +476,9 @@ def run_eval(
                 if spent + estimated > budget.hard_cap_usd:
                     if setting.role == "comparison" and len(remaining) > COMPARISON_REDUCED_ITEMS:
                         remaining = remaining[:COMPARISON_REDUCED_ITEMS]
+                        done_for_model = sum(1 for model, _ in done if model == setting.model_id)
+                        schedule[setting.model_id] = done_for_model + len(remaining)
+                        _write_schedule(state.schedule_file, schedule)
                         estimated = estimate_cost_usd(setting, len(remaining), paths.prices)
                     if spent + estimated > budget.hard_cap_usd:
                         msg = (
@@ -488,6 +530,19 @@ def run_eval(
 
         all_cards = _sort_cards(load_cards(state.cards_file), items, settings)
         _rewrite_cards(state.cards_file, all_cards)
+
+        # Record the plan actually executed (400 primary / 200 comparison for the live
+        # run). Replay regenerates it from the committed calls; a record run writes it
+        # at the cut too, so a crash before the end still leaves the cut on disk.
+        if calls:
+            executed = {
+                setting.model_id: sum(1 for key in calls if key[0] == setting.model_id)
+                for setting in settings
+            }
+            _write_schedule(
+                state.schedule_file,
+                {model: count for model, count in executed.items() if count},
+            )
 
         finished = REPLAY_NOW if is_replay else (wall_clock or (lambda: datetime.now(UTC)))()
         total_cost = sum(

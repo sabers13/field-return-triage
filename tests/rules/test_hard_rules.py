@@ -335,6 +335,35 @@ def test_a_dropped_clue_is_not_quoted_on_the_card(rulebook: Rulebook) -> None:
     )
     card = build(rulebook, quote_check=check)
     assert card.quotes == ("went dark",)
+    assert [clue.quote for clue in card.extraction.conditions] == []
+
+
+def test_a_mileage_only_card_needs_human_reading(rulebook: Rulebook) -> None:
+    extraction = make_extraction(
+        symptoms=(),
+        conditions=(),
+        mileage=make_mileage(),
+    )
+    check = make_quote_check(checked=1, passed=1)
+    card = build(rulebook, extraction=extraction, quote_check=check)
+    assert card.priority is Priority.HUMAN_READING
+    assert card.needs_human_review is True
+    assert card.quotes == ("54,000 miles",)
+    assert any("no clue passed the quote check" in reason.text for reason in card.reasons)
+
+
+def test_a_dropped_safety_quote_is_not_repeated_in_the_reasons(rulebook: Rulebook) -> None:
+    extraction = make_extraction(safety_relevant=True, safety_quote="caught fire")
+    check = make_quote_check(
+        checked=3,
+        passed=2,
+        dropped=(DroppedClue(field="safety", kind="safety", quote="caught fire"),),
+    )
+    card = build(rulebook, extraction=extraction, quote_check=check)
+    safety_reason = card.reasons[0]
+    assert "failed the quote check" in safety_reason.text
+    assert "caught fire" not in safety_reason.text
+    assert safety_reason.quotes == ()
 
 
 def test_a_dropped_safety_quote_does_not_demote_a_safety_card(rulebook: Rulebook) -> None:

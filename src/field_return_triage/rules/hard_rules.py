@@ -69,6 +69,21 @@ def _kept_fault_codes(extraction: Extraction, quote_check: QuoteCheck) -> tuple[
     return tuple(item for item in extraction.fault_codes if item.quote not in dropped)
 
 
+def _clue_quotes(extraction: Extraction, quote_check: QuoteCheck) -> tuple[str, ...]:
+    """The quotes of the kept failure clues, in reading order.
+
+    A mileage or a safety quote is supporting information, not a failure clue, so it
+    never counts as one here (``PLAN.md`` section 4, hard rule 2).
+    """
+    quotes: list[str] = []
+    quotes.extend(clue.quote for clue in _kept_clues(extraction.symptoms, "symptoms", quote_check))
+    quotes.extend(
+        clue.quote for clue in _kept_clues(extraction.conditions, "conditions", quote_check)
+    )
+    quotes.extend(item.quote for item in _kept_fault_codes(extraction, quote_check))
+    return _dedupe(quotes)
+
+
 def _kept_mileage_quote(extraction: Extraction, quote_check: QuoteCheck) -> str | None:
     if extraction.mileage is None:
         return None
@@ -81,17 +96,41 @@ def _safety_quote_kept(extraction: Extraction, quote_check: QuoteCheck) -> bool:
     return not any(row.field == "safety" for row in quote_check.dropped)
 
 
+def _kept_extraction(extraction: Extraction, quote_check: QuoteCheck) -> Extraction:
+    """The extraction with every failed clue dropped, as ``PLAN.md`` section 4 says.
+
+    Symptoms, conditions, fault codes and mileage are filtered, so the card's JSON and
+    the readable view can only show quotes that passed. The model's safety flag and its
+    quote stay on the extraction: the flag already made the case priority 1, and the
+    contract requires a quote whenever the flag is true. When that quote failed the
+    check, the reason text says so instead of repeating it (see ``_safety_findings``).
+    """
+    mileage_quote = _kept_mileage_quote(extraction, quote_check)
+    return extraction.model_copy(
+        update={
+            "symptoms": _kept_clues(extraction.symptoms, "symptoms", quote_check),
+            "conditions": _kept_clues(extraction.conditions, "conditions", quote_check),
+            "fault_codes": _kept_fault_codes(extraction, quote_check),
+            "mileage": extraction.mileage if mileage_quote is not None else None,
+        }
+    )
+
+
 def _safety_findings(
     complaint: Complaint,
     extraction: Extraction,
     keyword_quote: str | None,
+    quote_check: QuoteCheck | None = None,
 ) -> tuple[tuple[str, tuple[str, ...]], ...]:
     """Why the case is safety-relevant, as ``(text, quotes)`` in a fixed order."""
     findings: list[tuple[str, tuple[str, ...]]] = []
     if extraction.safety_relevant:
         quote = extraction.safety_quote or ""
         text = "the model marked the complaint safety-relevant"
-        findings.append((f"{text}: {quote}" if quote else text, (quote,) if quote else ()))
+        if quote and quote_check is not None and not _safety_quote_kept(extraction, quote_check):
+            findings.append((f"{text} (its quote failed the quote check)", ()))
+        else:
+            findings.append((f"{text}: {quote}" if quote else text, (quote,) if quote else ()))
     if keyword_quote:
         findings.append(
             (f"a safety keyword appears in the complaint: {keyword_quote}", (keyword_quote,))
@@ -141,7 +180,7 @@ def route(
     """
     if safety or complaint.coded_safety:
         return Priority.SAFETY, True
-    if extraction.component_group == UNCLEAR_GROUP or quote_check.passed == 0:
+    if extraction.component_group == UNCLEAR_GROUP or not _clue_quotes(extraction, quote_check):
         return Priority.HUMAN_READING, True
     return Priority.CLEAR_CLUES, False
 
@@ -242,14 +281,16 @@ def _routing_reason(
             quotes=(),
         )
     if priority is Priority.HUMAN_READING:
-        if extraction.component_group == UNCLEAR_GROUP and quote_check.passed == 0:
+        if extraction.component_group == UNCLEAR_GROUP and not _clue_quotes(
+            extraction, quote_check
+        ):
             why = "the component group is unclear and no clue passed the quote check"
         elif extraction.component_group == UNCLEAR_GROUP:
             why = "the component group is unclear"
         else:
             why = "no clue passed the quote check"
         return Reason(text=f"{why}: needs human reading", quotes=())
-    kept = _card_quotes(extraction, quote_check, None)
+    kept = _clue_quotes(extraction, quote_check)
     count = len(kept)
     noun = "clue" if count == 1 else "clues"
     return Reason(text=f"clear clues: {count} {noun} passed the quote check", quotes=kept)
@@ -275,17 +316,18 @@ def build_card(
     safety, _ = decides_safety(complaint, extraction, keyword_quote)
     priority, needs_human_review = route(complaint, extraction, quote_check, safety=safety)
     suggestion = suggest(extraction, quote_check, rulebook)
+    kept_extraction = _kept_extraction(extraction, quote_check)
 
     reasons = [
         Reason(text=text, quotes=quotes)
-        for text, quotes in _safety_findings(complaint, extraction, keyword_quote)
+        for text, quotes in _safety_findings(complaint, extraction, keyword_quote, quote_check)
     ]
     reasons.append(_routing_reason(extraction, quote_check, priority=priority))
 
     return TriageCard(
         card_id=f"{complaint.id}:{model_id}",
         complaint=complaint,
-        extraction=extraction,
+        extraction=kept_extraction,
         quote_check=quote_check,
         priority=priority,
         needs_human_review=needs_human_review,

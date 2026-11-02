@@ -155,6 +155,37 @@ def test_a_paraphrased_quote_is_dropped(rulebook: Rulebook) -> None:
     assert card.quote_check.dropped
     assert card.priority is Priority.HUMAN_READING
     assert "the dashboard went black" not in card.quotes
+    assert "the dashboard went black" not in card.extraction.model_dump_json()
+    assert "the dashboard went black" not in render_card(card)
+
+
+def test_an_invented_component_group_becomes_unclear(rulebook: Rulebook) -> None:
+    content = json.dumps(
+        {
+            "component_group": "engine",
+            "safety_relevant": False,
+            "safety_quote": None,
+            "symptoms": [{"kind": "display_fault", "quote": "went dark"}],
+            "conditions": [],
+            "fault_codes": [],
+            "mileage": None,
+        }
+    )
+    client = FakeClient(run_setting(), content=content)
+    empty = ([], np.zeros((0, 384), dtype=np.float32))
+    card, _ = triage_item(
+        make_complaint(),
+        client=client,  # type: ignore[arg-type]
+        library=(),
+        rulebook=rulebook,
+        groups={"instrument_panel_displays": "instrument panel"},
+        keywords=("smoke",),
+        index=empty,
+        now=NOW,
+    )
+    assert card.extraction.component_group == "unclear"
+    assert card.priority is Priority.HUMAN_READING
+    assert card.needs_human_review
 
 
 def test_triage_text_reads_raw_text(rulebook: Rulebook) -> None:

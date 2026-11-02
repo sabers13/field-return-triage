@@ -20,7 +20,12 @@ import numpy as np
 from numpy.typing import NDArray
 
 from field_return_triage.contracts import Complaint
-from field_return_triage.similar.embedder import EMBEDDING_MODEL, Embedder, default_embedder
+from field_return_triage.similar.embedder import (
+    EMBEDDING_MODEL,
+    EMBEDDING_REVISION,
+    Embedder,
+    default_embedder,
+)
 
 __all__ = [
     "DEFAULT_CHECKSUMS",
@@ -103,6 +108,7 @@ def build_index(
         ids=np.asarray(ids, dtype=np.str_),
         vectors=vectors,
         model=np.asarray(EMBEDDING_MODEL),
+        revision=np.asarray(EMBEDDING_REVISION),
         checksums=np.asarray(checksum_key(checksums)),
     )
     return path
@@ -123,11 +129,19 @@ def load_index(path: Path | None = None) -> tuple[list[str], NDArray[np.float32]
         ids = [str(value) for value in archive["ids"].tolist()]
         vectors = np.asarray(archive["vectors"], dtype=np.float32)
         model = str(archive["model"].item()) if "model" in archive else EMBEDDING_MODEL
+        revision = str(archive["revision"].item()) if "revision" in archive else None
     finally:
         archive.close()
 
     if model != EMBEDDING_MODEL:
         msg = f"index was built with {model}, expected {EMBEDDING_MODEL}; run `make index`"
+        raise ValueError(msg)
+    if revision != EMBEDDING_REVISION:
+        found = revision or "no pinned revision"
+        msg = (
+            f"index was built with {found}, expected revision {EMBEDDING_REVISION}; "
+            "run `make index`"
+        )
         raise ValueError(msg)
     if len(ids) == 0:
         msg = f"{resolved}: the index holds no ids"

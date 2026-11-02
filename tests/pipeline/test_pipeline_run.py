@@ -185,6 +185,31 @@ def test_budget_guard_reduces_the_comparison_model(tmp_path: Path) -> None:
     calls = calls_path(recordings).read_text(encoding="utf-8").splitlines()
     assert len(calls) == 600
 
+    schedule = json.loads((tmp_path / "runs" / "budget" / "schedule.json").read_text())
+    assert schedule == {"fixture-primary": 400, "fixture-comparison": 200}
+
+    # A resume after the cut is idempotent: the 200 unscheduled comparison items are
+    # not estimated again, so the guard does not stop the completed run.
+    created.clear()
+    run_eval(
+        mode=RunMode.RECORD,
+        models_path=lock,
+        run_id="budget",
+        items_path=items,
+        out_dir=tmp_path / "runs",
+        budget_path=budget,
+        library_path=paths.library,
+        groups_path=paths.groups,
+        recordings_path=recordings,
+        prices_path=prices,
+        index=([], None),  # type: ignore[arg-type]
+        clock=fake_clock(0.5),
+        client_factory=factory,  # type: ignore[arg-type]
+    )
+    assert created == []
+    assert len(calls_path(recordings).read_text(encoding="utf-8").splitlines()) == 600
+    assert len(load_cards(tmp_path / "runs" / "budget" / "cards.jsonl")) == 600
+
 
 def test_budget_guard_stops_before_the_cap(tmp_path: Path) -> None:
     paths = fixture_paths()

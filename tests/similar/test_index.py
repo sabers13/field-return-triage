@@ -9,6 +9,7 @@ import pytest
 from support import FakeEmbedder, make_complaint
 
 from field_return_triage.similar import index as index_module
+from field_return_triage.similar.embedder import EMBEDDING_MODEL, EMBEDDING_REVISION
 from field_return_triage.similar.index import (
     build_index,
     cache_dir,
@@ -109,6 +110,36 @@ def test_wrong_vector_count_is_rejected(checksums: Path) -> None:
 def test_missing_index_names_the_command_to_run(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError, match="make index"):
         load_index(tmp_path / "absent.npz")
+
+
+def test_index_pins_and_checks_the_embedding_revision(checksums: Path) -> None:
+    path = build_index(_library(), embedder=FakeEmbedder(), checksums=checksums)
+    with np.load(path, allow_pickle=False) as archive:
+        assert str(archive["revision"].item()) == EMBEDDING_REVISION
+
+    np.savez_compressed(
+        path,
+        ids=np.asarray(["c1"], dtype=np.str_),
+        vectors=np.ones((1, 4), dtype=np.float32),
+        model=np.asarray(EMBEDDING_MODEL),
+        checksums=np.asarray(checksum_key(checksums)),
+    )
+    with pytest.raises(ValueError, match="no pinned revision"):
+        load_index(path)
+
+
+def test_a_different_revision_is_refused(checksums: Path) -> None:
+    path = build_index(_library(), embedder=FakeEmbedder(), checksums=checksums)
+    np.savez_compressed(
+        path,
+        ids=np.asarray(["c1"], dtype=np.str_),
+        vectors=np.ones((1, 4), dtype=np.float32),
+        model=np.asarray(EMBEDDING_MODEL),
+        revision=np.asarray("0" * 40),
+        checksums=np.asarray(checksum_key(checksums)),
+    )
+    with pytest.raises(ValueError, match="expected revision"):
+        load_index(path)
 
 
 def test_corrupt_index_is_rejected(tmp_path: Path) -> None:

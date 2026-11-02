@@ -108,7 +108,7 @@ one against the file named beside it.
 | Quote grounding, primary | 1.000 | `results/SUMMARY.md` | `1.000 (0.997-1.000)` |
 | Similar-case precision@5, primary | 0.823 | `results/SUMMARY.md` | `0.823 (0.805-0.839)` |
 | Condition agreement, primary (not accuracy) | 0.915 | `results/SUMMARY.md` | `0.915 (0.905-0.924)` |
-| Cards sent to "needs human reading", primary | 0.660 | `results/SUMMARY.md` | `0.660 (0.612-0.705)` |
+| Cards sent to "needs human reading", primary | 0.667 | `results/SUMMARY.md` | `0.667 (0.620-0.712)` |
 | Cards at safety priority 1, primary | 0.557 | `results/SUMMARY.md` | `0.557 (0.509-0.605)` |
 | Cost per 1,000 items, primary | USD 0.2440 | `results/SUMMARY.md` | `$0.2440 ($0.2372-$0.2512)` |
 | Cost per 1,000 items, comparison | USD 6.1247 | `results/SUMMARY.md` | `$6.1247 ($5.8977-$6.3432)` |
@@ -116,7 +116,7 @@ one against the file named beside it.
 | Trend alerts that precede a recall | 37.6% (35 of 93) | `results/SUMMARY.md` | `share 37.6%` |
 | Base rate for random same-series weeks | 32.3% | `results/SUMMARY.md` | `32.3%` |
 | Evaluation items | 400 | `results/runs/live/manifest.json` | `"item_count": 400` |
-| Run cost | USD 1.32254292 | `results/runs/live/manifest.json` | `"cost_usd": 1.32254292` |
+| Live evaluation cost | USD 1.32254292 | `results/runs/live/manifest.json` | `"cost_usd": 1.32254292` |
 
 <!-- facts:end -->
 
@@ -135,11 +135,13 @@ What the table says, in words:
 - **Similar cases.** 0.823 of the five nearest past cases share the query's group.
 - **Condition agreement.** The primary agrees with the fixed keyword rule on 0.915 of
   items. That is agreement, not accuracy: there is no ground truth for conditions.
-- **Routing.** 0.660 of the primary's cards land in "needs human reading" and 0.557 at
+- **Routing.** 0.667 of the primary's cards land in "needs human reading" and 0.557 at
   safety priority 1. The system hands work to a technician rather than replacing the
   reading.
 - **Cost.** The primary costs USD 0.2440 per 1,000 items; the comparison costs USD 6.1247
-  and was cut to 200 items. The whole paid run cost USD 1.32254292 of its cap.
+  and was cut to 200 items. The live evaluation cost USD 1.32254292; the whole paid run,
+  including the probes and smoke rounds, cost USD 1.584697 of the USD 3 cap
+  (`reports/RUN.md`).
 - **Trend watch.** 93 spike alerts, 35 of which precede a recall (37.6%), against a 32.3%
   base rate for random weeks of the same series. The comparison to the base rate is the
   headline; the raw share alone would overstate the signal.
@@ -151,8 +153,9 @@ interrupted-and-resumed live run, is in [`reports/RUN.md`](reports/RUN.md).
 ## Screenshots
 
 The release page is generated into `dist/field-return-triage/`. Page screenshots, at
-360 px and 1280 px in light and dark, live under `results/page/screenshots/` and are
-linked from the live page.
+360 px and 1280 px in light and dark, are release evidence saved outside the repository
+(the task folder, not `results/page/screenshots/`); the page itself ships no images and
+links none.
 
 ## Limits
 
@@ -167,7 +170,7 @@ linked from the live page.
 - **Safety is oversampled.** The evaluation set deliberately includes more
   safety-relevant complaints than a natural queue would, so safety recall on it is not
   the rate a live queue would see.
-- **Most cards still need a person.** 0.660 of the primary's cards land in "needs human
+- **Most cards still need a person.** 0.667 of the primary's cards land in "needs human
   reading" and 0.557 at safety priority. The system is tuned to hand work to a technician,
   not to replace the reading; a production queue would need the unclear rate brought down.
 - **Condition agreement is not accuracy.** There is no ground truth for condition labels,

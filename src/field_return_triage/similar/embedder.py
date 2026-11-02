@@ -48,10 +48,16 @@ class Embedder(Protocol):
 
 
 class SentenceTransformerEmbedder:
-    """The real CPU model, loaded on first use and reused for the process lifetime."""
+    """The real CPU model, loaded on first use and reused for the process lifetime.
 
-    def __init__(self) -> None:
+    ``local_files_only`` is true by default: replay must never touch the network, so a
+    missing local model is an error telling the caller to run ``make index`` once, not a
+    silent download. ``make index`` is the one command that passes ``False``.
+    """
+
+    def __init__(self, *, local_files_only: bool = True) -> None:
         self._model: Any = None
+        self._local_files_only = local_files_only
 
     def _load_model(self) -> Any:
         if self._model is None:
@@ -60,7 +66,7 @@ class SentenceTransformerEmbedder:
             except ModuleNotFoundError as exc:  # pragma: no cover - real index only
                 msg = (
                     "the index extra is not installed; run `uv sync --extra index` "
-                    "(or `make setup`) before `make index`"
+                    "before `make index`"
                 )
                 raise RuntimeError(msg) from exc
             self._model = SentenceTransformer(
@@ -68,6 +74,7 @@ class SentenceTransformerEmbedder:
                 revision=EMBEDDING_REVISION,
                 device="cpu",
                 trust_remote_code=False,
+                local_files_only=self._local_files_only,
             )
         return self._model
 
@@ -95,7 +102,11 @@ class SentenceTransformerEmbedder:
         return np.asarray(vectors, dtype=np.float32)
 
 
-@lru_cache(maxsize=1)
-def default_embedder() -> Embedder:
-    """The pinned CPU model, downloaded once by ``make index`` and cached in-process."""
-    return SentenceTransformerEmbedder()
+@lru_cache(maxsize=2)
+def default_embedder(*, allow_download: bool = False) -> Embedder:
+    """The pinned CPU model, cached in-process.
+
+    It is offline by default. ``make index`` passes ``allow_download=True`` for the one
+    permitted cold-cache download; every replay path stays offline.
+    """
+    return SentenceTransformerEmbedder(local_files_only=not allow_download)

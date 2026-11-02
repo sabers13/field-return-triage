@@ -22,6 +22,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from field_return_triage.contracts import (
+    UNCLEAR_GROUP,
     Complaint,
     Extraction,
     Neighbour,
@@ -114,6 +115,11 @@ def triage_item(
         extraction = Extraction()
         quote_check = EMPTY_CHECK
     else:
+        if extraction.component_group != UNCLEAR_GROUP and extraction.component_group not in groups:
+            # The prompt lists the group ids and the answer must pick one of them. An
+            # invented id is not a real group: map it to `unclear` so the hard rules
+            # send the card to human reading (PLAN section 4, hard rule 2).
+            extraction = extraction.model_copy(update={"component_group": UNCLEAR_GROUP})
         quote_check = check_quotes(extraction, complaint.narrative)
 
     found = _neighbours(complaint, library, index, embedder)

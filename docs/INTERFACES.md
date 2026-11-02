@@ -275,8 +275,9 @@ class Embedder(Protocol):
     def encode(self, texts: Sequence[str], *, batch_size: int = 64) -> NDArray[np.float32]: ...
 
 
-def default_embedder() -> Embedder:
-    """The CPU sentence-transformers model; downloaded once, only by `make index`."""
+def default_embedder(*, allow_download: bool = False) -> Embedder:
+    """The CPU sentence-transformers model; offline by default, and `make index` is the
+    only caller that passes `allow_download=True` for the one-time download."""
 
 
 def cache_dir() -> Path:
@@ -558,7 +559,9 @@ def run_baselines(items: Sequence[Complaint], library: Sequence[Complaint]) -> d
 
 `triage_main` reads a file or stdin and prints JSON plus a readable text view.
 `eval_main` maps `--mode` to `RunMode`, requires `FRT_ENV_FILE` or `.env` only in record
-mode, and writes `results/runs/<id>/{manifest.json,cards.jsonl,metrics.json}`. R6 adds
+mode, and writes `results/runs/<id>/{manifest.json,cards.jsonl,metrics.json,schedule.json}`.
+The schedule records how many items each model was planned to run, so a resumed run
+honours the PLAN section 8 cut instead of re-estimating items the cut removed. R6 adds
 `--models FILE` and `--run-id ID` to the `frt eval` command, plus these keyword-only
 `run_eval` parameters with defaults: `library_path`, `groups_path`, `recordings_path`,
 `prices_path`, `checksums_path`, `index`, `embedder`, `clock`, `wall_clock` and

@@ -216,6 +216,20 @@ def _baseline_rows(baseline_dir: Path) -> list[str]:
     return lines
 
 
+def _interval_bounds(value: Any) -> tuple[float, float] | None:
+    """Read a 95% interval written as ``{"low", "high"}`` or a two-item list."""
+    if isinstance(value, Mapping):
+        low, high = value.get("low"), value.get("high")
+        if isinstance(low, (int, float)) and isinstance(high, (int, float)):
+            return float(low), float(high)
+        return None
+    if isinstance(value, list) and len(value) > 1:
+        low, high = value[0], value[1]
+        if isinstance(low, (int, float)) and isinstance(high, (int, float)):
+            return float(low), float(high)
+    return None
+
+
 def _trend_lines(trend_dir: Path) -> list[str]:
     backtest = _read_json(trend_dir / "backtest.json")
     if backtest is None:
@@ -224,19 +238,17 @@ def _trend_lines(trend_dir: Path) -> list[str]:
     base = _mapping(backtest.get("base_rate"))
     share = alerts.get("share")
     base_share = base.get("share")
-    interval: Any = base.get("ci95")
-    interval_low = (
-        f"{interval[0]:.1%}" if isinstance(interval, list) and len(interval) > 0 else "n/a"
-    )
-    interval_high = (
-        f"{interval[1]:.1%}" if isinstance(interval, list) and len(interval) > 1 else "n/a"
-    )
+    median_lead = alerts.get("median_lead_days")
+    interval = _interval_bounds(base.get("ci95"))
+    interval_low = f"{interval[0]:.1%}" if interval is not None else "n/a"
+    interval_high = f"{interval[1]:.1%}" if interval is not None else "n/a"
     lines = [
-        "- Alerts: {total}; preceding a recall: {hits} (share {share}) - "
-        "`results/trend/backtest.json`".format(
+        "- Alerts: {total}; preceding a recall: {hits} (share {share}); median lead "
+        "{lead} days - `results/trend/backtest.json`".format(
             total=alerts.get("total", 0),
             hits=alerts.get("preceding_recall", 0),
             share=f"{share:.1%}" if isinstance(share, (int, float)) else "n/a",
+            lead=f"{median_lead:.1f}" if isinstance(median_lead, (int, float)) else "n/a",
         ),
         "- Base rate for random same-series weeks: {share} (95% CI {low}-{high}) - "
         "`results/trend/backtest.json`".format(
@@ -309,6 +321,11 @@ def build_summary(
                 "",
                 "Final is the hard-rule decision; model-only is the model's own flag. "
                 "Both are scored against the coded crash/fire/injury fields.",
+                "",
+                "The final decision includes the coded crash/fire/injury fields, so a "
+                "coded case is priority 1 by construction and final recall cannot miss "
+                "one. Model-only is the model's own flag without the keyword rule or the "
+                "coded fields.",
                 "",
                 *_safety_rows(metrics),
                 "",

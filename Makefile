@@ -34,7 +34,7 @@ index: ## Embed the library into the local vector cache (lane R3)
 	uv run --extra index python -m field_return_triage.similar.cli
 
 index-cached: ## Reuse the embedding index, build it only when missing (lane R6)
-	uv run python -m field_return_triage.pipeline.cli index-cached
+	uv run --extra index python -m field_return_triage.pipeline.cli index-cached
 
 test: ## Run the test suite with the network blocked
 	$(PYTEST) -q
@@ -60,7 +60,7 @@ facts: ## Check every published number against the results file that proves it
 	$(PYTHON) scripts/check_facts.py
 
 eval-replay: ## Score the eval set from committed recordings (lane R6)
-	uv run python -m field_return_triage.pipeline.cli eval-replay
+	uv run --extra index python -m field_return_triage.pipeline.cli eval-replay
 
 probe: ## One paid call per locked model; records recordings/probes.json (lane R7)
 	uv run python -m field_return_triage.pipeline.cli probe
@@ -72,7 +72,7 @@ trend: ## Detect weekly spikes and backtest them against recalls (lane R5)
 	uv run python -m field_return_triage.trend.cli
 
 results: ## Export results and the summary from replay (lane R6)
-	uv run python -m field_return_triage.pipeline.cli results
+	uv run --extra index python -m field_return_triage.pipeline.cli results
 
 page-data: ## Build results/page/page-data.json (lane R8)
 	uv run python -m field_return_triage.report.cli page-data

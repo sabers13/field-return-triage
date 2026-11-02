@@ -26,6 +26,8 @@ Macro-F1 is the primary metric; `unclear` counts as wrong.
 
 Final is the hard-rule decision; model-only is the model's own flag. Both are scored against the coded crash/fire/injury fields.
 
+The final decision includes the coded crash/fire/injury fields, so a coded case is priority 1 by construction and final recall cannot miss one. Model-only is the model's own flag without the keyword rule or the coded fields.
+
 | Model | Final recall | Final precision | Model-only recall | Model-only precision |
 | --- | --- | --- | --- | --- |
 | `gemini-4-argon` | 1.000 (0.906-1.000) | 0.487 (0.378-0.597) | 1.000 (0.906-1.000) | 0.569 (0.448-0.682) |
@@ -35,8 +37,8 @@ Final is the hard-rule decision; model-only is the model's own flag. Both are sc
 
 | Model | Quote grounding | Condition agreement | Precision@5 | Priority 1 share | Needs human share | Invalid answers |
 | --- | --- | --- | --- | --- | --- | ---: |
-| `gemini-4-argon` | 1.000 (0.995-1.000) | 0.887 (0.874-0.901) | 0.825 (0.800-0.847) | 0.380 (0.316-0.449) | 0.455 (0.387-0.524) | 0 |
-| `muse-spark-1.3-contributor` | 1.000 (0.997-1.000) | 0.915 (0.905-0.924) | 0.823 (0.805-0.839) | 0.557 (0.509-0.605) | 0.660 (0.612-0.705) | 0 |
+| `gemini-4-argon` | 1.000 (0.995-1.000) | 0.887 (0.874-0.901) | 0.825 (0.800-0.847) | 0.380 (0.316-0.449) | 0.460 (0.392-0.529) | 0 |
+| `muse-spark-1.3-contributor` | 1.000 (0.997-1.000) | 0.915 (0.905-0.924) | 0.823 (0.805-0.839) | 0.557 (0.509-0.605) | 0.667 (0.620-0.712) | 0 |
 
 | Model | Cost per 1,000 (95% CI) | Total cost | Latency p50 | Latency p95 |
 | --- | --- | --- | --- | --- |
@@ -53,8 +55,8 @@ See `results/baseline/`.
 
 ## Trend watch
 
-- Alerts: 93; preceding a recall: 35 (share 37.6%) - `results/trend/backtest.json`
-- Base rate for random same-series weeks: 32.3% (95% CI n/a-n/a) - `results/trend/backtest.json`
+- Alerts: 93; preceding a recall: 35 (share 37.6%); median lead 70.0 days - `results/trend/backtest.json`
+- Base rate for random same-series weeks: 32.3% (95% CI 23.6%-42.3%) - `results/trend/backtest.json`
 
 ## Files
 

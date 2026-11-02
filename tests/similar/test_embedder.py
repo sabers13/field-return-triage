@@ -41,3 +41,9 @@ def test_non_positive_batch_size_is_rejected_before_loading() -> None:
 
 def test_default_embedder_is_one_process_wide_instance() -> None:
     assert default_embedder() is default_embedder()
+
+
+def test_replay_is_offline_and_only_make_index_may_download() -> None:
+    assert SentenceTransformerEmbedder()._local_files_only is True
+    assert SentenceTransformerEmbedder(local_files_only=False)._local_files_only is False
+    assert default_embedder() is not default_embedder(allow_download=True)
